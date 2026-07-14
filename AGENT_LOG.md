@@ -213,3 +213,42 @@ Read this at the start of each session.
 - Next: M5 — alarm evaluation SQL function invoked by the worker,
   stagnation/due-soon rules (§6), alarm events + alarm_state_cached
   escalation, time-mocked scenario matrix.
+
+## 2026-07-14 — M5 complete (alarm engine)
+
+**What was done**
+
+- 0020: `blocked_below_cached` (independent bit per plan M5) and
+  `stagnation_days_override` (branches only) on node; visible_nodes
+  exposes both (masked on skeleton rows).
+- 0021: `evaluate_alarms(p_now)` — set-based pass over all tenants: due
+  window via `alarm_lead_days` (max(3 d, 20 % runway)), stagnation with
+  nearest-ancestor override else tenant default, blocked suppresses
+  stagnation structurally, never-started tasks alarm only inside the due
+  window, archived subtrees excluded. Raised-state derives from the event
+  log (latest alarm.raised/cleared per task+kind — no extra table);
+  overdue escalates the cached state without a second event. Task cached
+  state = worst condition; branch state = worst in subtree with
+  independent blocked_below. `configure_branch_alarms` (branch_admin/§7)
+  with node.updated event. Worker invokes the function via owner
+  connection and logs raised/cleared counts.
+- tests/unit/alarms.test.ts: 13 time-mocked scenarios in rollback
+  transactions (now() frozen; evaluation at now()+Δ): blocked+due_soon
+  coexistence, never-started due-window double alarm + silent overdue
+  escalation, done never alarms, stagnation raise/clear + idempotence,
+  exact lead-time boundary (Δ15 quiet, Δ16 fires), postpone clears,
+  branch worst-of + independent blocked_below, overrides (30 quiet /
+  2 fires), branch-only override guard, no-due blind spot, archive
+  clears, tenant isolation (per-tenant defaults, zero cross-tenant event
+  rows), seed smoke incl. t1's §15.3 due alarm alongside blocked.
+- Full regression green: 88 Vitest, 28 SQL checks, 6 Playwright, build,
+  worker pass over seed (16 raised).
+
+**Caveats / follow-ups**
+
+- Branch alarm/blocked_below caches refresh on the 30-min pass only;
+  task-row blocked icons should render from live status in M6.
+- Next: M6 — shared signal components (ramp, three signals at four
+  scales, status chip), Glance grid with drill-down, Branch view, Task
+  view with status/percent/time controls, read-only §15.2 rendering,
+  Playwright matrix as two members.
