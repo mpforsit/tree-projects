@@ -252,3 +252,53 @@ Read this at the start of each session.
   scales, status chip), Glance grid with drill-down, Branch view, Task
   view with status/percent/time controls, read-only §15.2 rendering,
   Playwright matrix as two members.
+
+## 2026-07-14 — M6 complete (core views: Glance, Branch, Task)
+
+**What was done**
+
+- 0022: `user_preference` (per-user-per-tenant, own-row RLS, direct
+  app_user DML — UI state, not domain data).
+- lib: `progress.ts` (exact handover ramp incl. anchor tests), `time.ts`
+  (parseDuration 45m/1,5h + formatMinutes), `format.ts` (DD.MM.,
+  D. MMMM YYYY, German relative ages), `activity.ts` (event → German
+  line), tree read helpers; full German string catalog.
+- components/signals.tsx: the three-signal system at all scales —
+  ProgressBar (dashed track for "—"), PercentNumeral (ramp-colored,
+  tabular), AlarmGlyph (one triangle, outline→filled), BlockedIcon,
+  StatusChip, Avatar, SignalBadges. globals.css gained the component
+  classes and the two §5 motions (240 ms drill-down with click-point
+  transform-origin via sessionStorage + ZoomIn wrapper; 180 ms fade).
+- Glance: 12-col dense grid, huge (6×2, mini-rows of children or top
+  tasks) / small (3×1) cards, per-card size toggle persisted server-side,
+  alarm-severity sort, signal legend. Glance roots rule in DECISIONS.
+- Branch: breadcrumb with skeleton crumbs (muted, dashed, non-clickable,
+  tooltip, tiny % per tenant setting), header with badges + 26 px
+  percent + 150 px bar, sub-branch card grid, task list (status chip,
+  ellipsis title, live blocked icon, alarm glyph, 44 px micro-bar,
+  percent, avatar, colored due date, "⟳ vor N Tagen"/"noch nie ⟳") with
+  filter chips + avatar toggles, both empty states, "+ Aufgabe" for
+  members and "+ Teilbereich" only when the flag allows (§15.2 hidden).
+- Task: two-column; description (dashed placeholder), information stream
+  (Manuell/Teams/KI badges, AI tint, "Thread öffnen ↗"), discussion with
+  input, activity from the event log; rail with status control (8 px gap
+  before blockiert + suppression note), five-segment percent control
+  (ramp-filled, deselect-to-zero confirm, done-locked), time entry
+  (presets, free-field parsing, "Heute erfasst", "Deine Einträge").
+  §15.2: non-responsible viewers get disabled controls with the tooltip.
+- Server actions (status/percent/time/comment/create/card size) re-derive
+  user+tenant per call; DB enforces again.
+- e2e: 7 new view scenarios as four different members (grayed+tooltip,
+  hidden "+ Teilbereich", admin sees it, skeleton crumb non-clickable,
+  percent→chip→branch-header rollup round-trip 20 %→27 %, empty branch
+  "—"+dashed panel, task-view content incl. 14 h 45 m total). 13 e2e
+  total, 97 unit tests, 28 SQL checks — all green.
+- Bug found by e2e: readNodeEvents used app_current_tenant() which
+  app_user may not execute — switched to the granted app_tenant_or_null().
+
+**Caveats / follow-ups**
+
+- Search field stays a stub (M7); My-Work page still placeholder (M7).
+- Playwright expect timeout raised to 15 s (dev-server first-compile).
+- Next: M7 — My Work (Meine Alarme + grouped cross-tree list) and
+  Postgres FTS search over visible_nodes with keyboard flow.

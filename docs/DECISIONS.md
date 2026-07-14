@@ -31,3 +31,6 @@ done). One line each: what, why, date.
 - Overdue raises no separate event: it is a stronger visual state of the raised due_soon alarm (§3 kinds are due_soon|stagnant); `alarm_state_cached` distinguishes it. — 2026-07-14
 - Branch stagnation overrides live in `node.stagnation_days_override` (branches only, nearest ancestor wins); §6 names the feature but §2.1 has no field for it. — 2026-07-14
 - The alarm worker connects with the owner role (trusted system component, like the migration step); `evaluate_alarms` takes `p_now` for time-mocked tests and is not granted to app_user. `blocked_below_cached`/branch alarm state refresh on each 30-min pass, not transactionally. — 2026-07-14
+- `user_preference` (glance card sizes) is UI state outside the event-sourced domain: app_user writes it directly under an own-row RLS policy, no events, no SECURITY DEFINER ceremony. — 2026-07-14
+- Glance roots: the member's full-visible branches without a full-visible parent; a single root shows its CHILDREN as cards (matches the prototype where the tenant root is skeleton context, not a card). — 2026-07-14
+- Task rows render the blocked icon from live status; branch cards use the 30-min cached blocked_below/alarm state (M5 decision carried into the views). — 2026-07-14
