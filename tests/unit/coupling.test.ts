@@ -41,20 +41,24 @@ const u = SEED.users;
 const cases: Case[] = [
   // --- set_task_status from open (t3, responsible AD)
   {
-    name: "open → in_progress bumps percent to 20 (in_progress at 0 % is unrepresentable)",
+    name: "open → in_progress keeps percent 0 (invariant weakened to open ⇒ 0 %)",
     taskId: t.t3, actor: u.ad, action: "status", value: "in_progress",
     expect: {
-      status: "in_progress", percent: 20,
+      status: "in_progress", percent: 0,
       events: [
         { type: "task.status_changed", payload: { old: "open", new: "in_progress" } },
-        { type: "task.percent_changed", payload: { old: 0, new: 20, reason: "status_change" } },
       ],
     },
   },
   {
-    name: "open → blocked is rejected (open ⇔ 0 %)",
+    name: "open → blocked keeps percent 0 (unstarted tasks can be blocked)",
     taskId: t.t3, actor: u.ad, action: "status", value: "blocked",
-    error: /cannot be blocked/,
+    expect: {
+      status: "blocked", percent: 0,
+      events: [
+        { type: "task.status_changed", payload: { old: "open", new: "blocked" } },
+      ],
+    },
   },
   {
     name: "open → done forces 100",
@@ -237,14 +241,11 @@ const cases: Case[] = [
     },
   },
   {
-    name: "percent 0 on blocked reopens (open ⇔ 0 %)",
+    name: "percent 0 on blocked stays blocked (unblocking is an explicit status act)",
     taskId: t.t1, actor: u.ik, action: "percent", value: 0,
     expect: {
-      status: "open", percent: 0,
-      events: [
-        { type: "task.percent_changed", payload: { old: 60, new: 0 } },
-        { type: "task.status_changed", payload: { old: "blocked", new: "open", reason: "percent_change" } },
-      ],
+      status: "blocked", percent: 0,
+      events: [{ type: "task.percent_changed", payload: { old: 60, new: 0 } }],
     },
   },
   {
