@@ -30,6 +30,15 @@ exposed publicly.
 - ☐ Secrets set via Coolify environment variables: `APP_ENV`,
   `DATABASE_URL_OWNER` (owner role, used only by the migration step),
   `DATABASE_URL` (app_user role), `SMTP_*`.
+- ☐ **Roles (M3):** the owner role must bypass RLS — every table is
+  `FORCE ROW LEVEL SECURITY` and the SECURITY DEFINER functions run as the
+  owner. The Coolify Postgres main user is a superuser (bypasses
+  inherently); for a non-superuser owner run once as superuser:
+  `ALTER ROLE <owner> BYPASSRLS;`
+- ☐ **app_user password (production):** migration 0015 creates the LOGIN
+  role without a password. Set it once as the owner:
+  `ALTER ROLE app_user PASSWORD '<secret>';` and put the same value into
+  `DATABASE_URL`. (Dev/staging: `pnpm db:reset` sets `treeops`.)
 - ☐ Scheduled task every 30 min:
   `node --experimental-strip-types scripts/worker-alarms.ts`
   (M0: heartbeat only; becomes the alarm engine in M5). Verify a heartbeat

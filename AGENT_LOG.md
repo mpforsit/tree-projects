@@ -111,3 +111,58 @@ Read this at the start of each session.
   trigger, pgTAP/SQL tests for allow AND deny incl. cross-tenant.
 - The M2 Vitest tests connect as the owner role; from M3 they should also
   run as app_user to prove EXECUTE-only access.
+
+## 2026-07-14 — Invariant amendment + M3 complete (RLS + rollup)
+
+**What was done**
+
+- 0014 (owner decision): `open ⇔ 0 %` weakened to `open ⇒ 0 %`. Blocking
+  and manually starting unstarted tasks is now representable; percent → 0
+  reopens from in_progress but keeps blocked blocked. Coupling matrix
+  updated (still 28 cases, 75 tests green).
+- 0015: `app_user` LOGIN role — owns nothing, EXECUTE on the 25 mutation
+  functions only, SELECT under RLS, NO grant on `node` (tree reads go
+  exclusively through `visible_nodes`). Blanket EXECUTE revoke + default
+  privileges, with extension internals re-granted (ltree operators broke
+  otherwise — see DECISIONS).
+- 0016: RLS ENABLEd AND FORCEd on all ten domain tables. SELECT-only
+  policies: tenant predicate everywhere; §5 membership-subtree for node;
+  follow-the-node for membership/time_log/info_piece/comment/event;
+  personal-row policy on time_log (owner/tenant-admin/HR); hidden info
+  pieces admin-only; node-less tenant events admin-only; tenant table
+  scoped to the user's memberships (drives the post-login picker);
+  domain_claim readable pre-login. Policy helpers are SECURITY DEFINER to
+  avoid RLS recursion. last_progress_at set to security_invoker.
+- 0017: `visible_nodes` (security_barrier, owner view): full rows =
+  membership subtree; strict ancestors = skeleton rows with CASE-masked
+  columns (title/type only; progress per tenant setting).
+  `task_time_totals`: totals for everyone with task visibility, past the
+  personal-row policy.
+- 0018: rollup on write — `rollup_compute_branch` / `rollup_recompute`
+  (ltree ancestor walk, bottom-up) + triggers on node (insert/delete/
+  percent/status/archived_at/parent_id) and time_log (insert/delete/
+  minutes). Weighted by minutes; all-zero-weight → unweighted average;
+  empty → NULL "—"; archived excluded (incl. archived branches between).
+  One-time full recompute replaces the seed's illustrative values.
+- tests/sql/m3_rls.sql (runs AS app_user; guarded against superuser): 14
+  checks — zero rows without context; no direct DML/raw reads/raw
+  write_event; MB tenant A full tree vs. tenant B zero tenant-A rows;
+  sibling invisibility; skeleton title-only + progress toggle; instance
+  admin sees nothing (invariant 6); time-log privacy incl. totals-only
+  and no-visibility cases; info soft-hide; event scoping; mutation
+  round-trip; exact rollup numbers (0 → 20 → 40 → 70 → 40 → 70).
+  `pnpm test:sql` now runs m1 (owner) + m3 (app_user).
+
+**Caveats / follow-ups**
+
+- Owner role must bypass RLS in production (FORCE RLS) — documented in
+  OPS.md; local/Coolify main users are superusers anyway.
+- better-auth (M4) will need write access for its own tables and the
+  `"user"` linkage — decide its role/grants in M4 (its tables don't exist
+  yet; `"user"` is RLS-FORCEd with a members-only read policy).
+- The dev Postgres for this environment lives at
+  /var/lib/postgresql/treeops-pgdata (port 5433, trust) — /tmp clusters
+  get killed by the environment.
+- Next: M4 — better-auth (email OTP + Entra OIDC), invitation flow,
+  domain→SSO enforcement, tenant routing middleware (slug vs.
+  memberships, 404 on mismatch), login screens per handover, app shell.

@@ -16,3 +16,8 @@ done). One line each: what, why, date.
 - `tenant.settings_changed` is written tenant-scoped (actor is the tenant admin per §15.1), deviating from §3's instance-level grouping; tenant create/rename stay instance-level with `tenant_id = null`. — 2026-07-14
 - Root-branch creation is tenant-admin-only; §7 defines branch creation only relative to a parent branch. — 2026-07-14
 - Branch title/description edits require branch_admin (or tenant admin); §7 only covers task editing. — 2026-07-14
+- **Invariant amendment (owner decision):** `open ⇔ 0 %` weakened to `open ⇒ 0 %` (migration 0014) so unstarted tasks can be blocked or manually started; supersedes the three entries above about open→blocked rejection and the forced 20 % bump. `done ⇔ 100` stays bidirectional. Deselect-to-zero reopens from `in_progress`; a blocked task at 0 % stays blocked (unblocking is an explicit status act). — 2026-07-14
+- Visibility is strictly membership-based even for tenant admins (§5 verbatim: "no third mechanism"); admin powers (§7) do not imply read access outside their memberships. — 2026-07-14
+- Node-less tenant events (member admin, settings) are visible to tenant admins only; events of deleted nodes become invisible to app users (history recoverable by the owner role). — 2026-07-14
+- `domain_claim` is readable by the app connection without context (policy `USING (true)`): the login flow must resolve domain→SSO before any user exists; claims gate auth methods and are not secret. — 2026-07-14
+- Extension-owned functions (ltree/citext/btree_gist support) keep PUBLIC EXECUTE after the blanket revoke in 0015 — operators like `<@` break otherwise. — 2026-07-14
