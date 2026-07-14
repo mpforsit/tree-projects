@@ -68,3 +68,46 @@ Read this at the start of each session.
 - Next up: M2 — SECURITY DEFINER mutation functions with coupling rules,
   `lib/db.ts` tenant-context transaction helper, `lib/events.ts`,
   `last_progress_at` view, Vitest table-driven coupling tests.
+
+## 2026-07-14 — M2 complete (mutation layer: events + coupling rules)
+
+**What was done**
+
+- Migrations 0007–0013: `domain_claim` registry (§8.2) · context/permission
+  helpers (`app_current_user/tenant`, `app_actor`, `app_instance_admin`,
+  `app_member_sees`, `app_is_branch_admin`, row-locking getters) +
+  `last_progress_at` view (§3) · node lifecycle functions (create/update/
+  move/archive/unarchive/delete) · task state functions with ALL §4
+  coupling rules (`set_task_status`, `set_task_percent`,
+  `set_responsible`) · time/content functions (add/correct time log,
+  comment, info add/hide) · membership + member admin (grant/revoke/role,
+  invite, flags with last-admin guard) · instance functions
+  (create_tenant, appoint_tenant_admin, domain claims, tenant settings).
+  All SECURITY DEFINER, permissions per §7 inside, actor/tenant from the
+  transaction-scoped settings, events written atomically via write_event.
+- `lib/db.ts`: withTenantContext/withUserContext transaction helper (the
+  only sanctioned DB entry point). `lib/events.ts`: event catalog types +
+  typed wrappers for every mutation function.
+- Vitest suite (75 tests, all green): 28-case table-driven §4 coupling
+  matrix incl. rejections and exact event payloads; §7 allow/deny paths
+  for every function; cross-tenant matrix (MB with tenant-B context
+  against tenant-A ids fails with "not found" on 10 functions);
+  instance-function tests; last_progress_at; lib/db end-to-end commit.
+  Global setup resets the DB per run.
+
+**Reasoning / decisions (details in docs/DECISIONS.md)**
+
+- open → blocked at 0 % is REJECTED (open ⇔ 0 % makes it unrepresentable)
+  — needs a product decision if blocking unstarted tasks matters.
+- Manual open → in_progress bumps percent to 20; done → blocked resets to
+  80 (mirror of reopen); tenant.settings_changed is tenant-scoped.
+- Drizzle deliberately not added yet — M2 needs only the tx helper and
+  function calls; Drizzle becomes useful when app reads start (M3+).
+
+**Caveats / follow-ups**
+
+- Next: M3 — app_user role, RLS policies (tenant predicate + §5
+  visibility), visible_nodes skeleton view, time-log privacy, rollup
+  trigger, pgTAP/SQL tests for allow AND deny incl. cross-tenant.
+- The M2 Vitest tests connect as the owner role; from M3 they should also
+  run as app_user to prove EXECUTE-only access.
