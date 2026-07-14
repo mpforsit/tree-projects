@@ -1,0 +1,31 @@
+{
+  "name": "treeops",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "db:migrate": "node --experimental-strip-types scripts/migrate.ts",
+    "test:sql": "psql \"$DATABASE_URL_OWNER\" -v ON_ERROR_STOP=1 -q -f tests/sql/m1_schema.sql",
+    "db:reset": "node --experimental-strip-types scripts/reset.ts",
+    "worker:alarms": "node --experimental-strip-types scripts/worker-alarms.ts"
+  },
+  "dependencies": {
+    "next": "^15.4.5",
+    "pg": "^8.16.3",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.0",
+    "@types/pg": "^8.15.4",
+    "@types/react": "^19.1.9",
+    "@types/react-dom": "^19.1.7",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
+  }
+}
