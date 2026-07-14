@@ -64,7 +64,7 @@ export async function readNodeEvents(
   const { rows } = await client.query<EventRow>(
     `SELECT id::text, tenant_id, node_id, actor_member_id, source, type, payload, created_at
      FROM event
-     WHERE tenant_id = app_current_tenant() AND node_id = $1
+     WHERE tenant_id = app_tenant_or_null() AND node_id = $1
      ORDER BY id`,
     [nodeId],
   );
