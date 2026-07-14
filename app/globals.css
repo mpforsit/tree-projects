@@ -93,3 +93,295 @@ button {
 input {
   font: inherit;
 }
+
+/* ---- shared UI (handover §2–§5) --------------------------------------- */
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  transition: border-color 120ms, box-shadow 120ms;
+}
+
+.card:hover {
+  border-color: var(--hoverbd);
+  box-shadow: 0 3px 14px rgba(40, 35, 20, 0.07);
+}
+
+.dashed-panel {
+  border: 1.5px dashed var(--dashed);
+  border-radius: 10px;
+  color: var(--faint);
+  padding: 22px;
+  text-align: center;
+  font-size: 13px;
+}
+
+.section-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  font-weight: 650;
+  color: var(--mut2);
+  margin: 0 0 10px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 650;
+  border-radius: 999px;
+  padding: 2.5px 9px;
+  white-space: nowrap;
+}
+
+.badge-blocked {
+  color: var(--plum);
+  background: rgba(122, 94, 168, 0.09);
+  border: 1px solid rgba(122, 94, 168, 0.28);
+}
+
+.badge-stagnant {
+  color: var(--al-stag);
+  background: rgba(143, 110, 30, 0.09);
+  border: 1px solid rgba(143, 110, 30, 0.28);
+}
+
+.badge-due_soon {
+  color: var(--al-due);
+  background: rgba(168, 84, 20, 0.09);
+  border: 1px solid rgba(168, 84, 20, 0.28);
+}
+
+.badge-overdue {
+  color: var(--al-over);
+  background: rgba(179, 54, 30, 0.12);
+  border: 1px solid rgba(179, 54, 30, 0.32);
+}
+
+.chip {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 650;
+  border-radius: 999px;
+  padding: 2.5px 9px;
+  background: var(--chipbg);
+  color: var(--mut);
+  white-space: nowrap;
+  text-align: center;
+}
+
+.chip-in_progress { color: var(--blue); }
+.chip-blocked { color: var(--plum); }
+.chip-done { color: var(--teal); }
+
+.track {
+  background: var(--track);
+  border-radius: 2px;
+  height: 3.5px;
+  overflow: hidden;
+}
+
+.track-empty {
+  background: none;
+  border-top: 1.5px dashed var(--dashed);
+  height: 0;
+}
+
+/* ---- glance ------------------------------------------------------------ */
+
+.glance-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-auto-flow: dense;
+  grid-auto-rows: 150px;
+  gap: 14px;
+}
+
+.glance-card {
+  grid-column: span 3;
+  grid-row: span 1;
+  padding: 14px 16px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+}
+
+.glance-card.big {
+  grid-column: span 6;
+  grid-row: span 2;
+}
+
+.glance-title {
+  font-size: 15px;
+  font-weight: 650;
+  margin: 0;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.mini-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 0;
+  border-top: 1px solid var(--border2);
+  font-size: 12.5px;
+  color: var(--text3);
+}
+
+/* ---- branch view ------------------------------------------------------- */
+
+.crumb {
+  font-size: 12.5px;
+  color: var(--mut);
+}
+
+.crumb a { color: var(--mut); }
+.crumb a:hover { color: var(--ink); }
+
+.crumb .skeleton-crumb {
+  color: var(--faint2);
+  border-bottom: 1.5px dashed var(--dashed);
+  cursor: default;
+}
+
+.subbranch-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.task-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 42px;
+  padding: 0 12px;
+  border-top: 1px solid var(--border2);
+  color: var(--ink);
+  font-size: 13.5px;
+}
+
+.task-row:hover { background: var(--surface2); }
+
+.task-title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.filter-chip {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--mut);
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.filter-chip.active {
+  background: var(--btn);
+  color: var(--btnfg);
+  border-color: var(--btn);
+}
+
+/* ---- task view --------------------------------------------------------- */
+
+.seg-control {
+  display: flex;
+  gap: 4px;
+}
+
+.seg {
+  flex: 1;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--mut);
+  border-radius: 7px;
+  padding: 7px 0;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.seg.active {
+  border-color: var(--ink);
+  color: var(--ink);
+  background: var(--surface);
+}
+
+.seg:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.info-card {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  font-size: 13px;
+  color: var(--text2);
+}
+
+.info-card.ai {
+  background: var(--aibg);
+  border-color: var(--aibd);
+}
+
+.source-badge {
+  font-size: 11px;
+  font-weight: 650;
+  border-radius: 999px;
+  padding: 1.5px 8px;
+  background: var(--chipbg);
+  color: var(--mut);
+}
+
+.source-badge.teams {
+  color: var(--teams);
+  background: rgba(75, 83, 168, 0.09);
+}
+
+.activity-item {
+  border-left: 2px solid var(--border);
+  padding: 4px 0 4px 12px;
+  font-size: 12.5px;
+  color: var(--text3);
+}
+
+/* ---- motion (handover §5: exactly two transitions) --------------------- */
+
+@keyframes drill-down {
+  from { opacity: 0; transform: scale(0.93); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.zoom-in {
+  animation: drill-down 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes view-fade {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.view-fade {
+  animation: view-fade 180ms ease-out;
+}
