@@ -15,6 +15,7 @@ next-env.d.ts
 coverage/
 playwright-report/
 test-results/
+.test-mail/
 
 # misc
 .DS_Store
