@@ -166,3 +166,50 @@ Read this at the start of each session.
 - Next: M4 — better-auth (email OTP + Entra OIDC), invitation flow,
   domain→SSO enforcement, tenant routing middleware (slug vs.
   memberships, 404 on mismatch), login screens per handover, app shell.
+
+## 2026-07-14 — M4 complete (auth + tenant routing + app shell)
+
+**What was done**
+
+- Deps: better-auth 1.6.23, nodemailer, @playwright/test (API verified
+  against the installed .d.ts before wiring).
+- 0019: auth tables (auth_session/account/verification/rate_limit,
+  snake_case), auth columns on `"user"`, role `auth_user` with scoped RLS
+  (auth tables full, users read/update, ONLY instance-level auth.* events).
+- lib/auth.ts: lazy better-auth server — email OTP (6 digits, 600 s expiry,
+  allowedAttempts 5, rotate-on-resend, sign-up disabled), 30 d sliding
+  sessions, uuid ids, snake_case field mappings, database rate limiting,
+  auth.login events via session-create hook, genericOAuth/Entra enabled
+  only when ENTRA_* set (explicit tenant, §8.2). lib/auth-client.ts,
+  lib/mail.ts (SMTP or file transport for test/dev), lib/tenants.ts.
+- /api/login/request-otp: SSO-enforced domains refused (§8.2), ≤5
+  requests/h/email over auth.otp_requested events, uniform response.
+- UI: /login per handover (email → 6 boxes with auto-advance/backspace/
+  one-time-code/paste, success state, Microsoft button when configured,
+  invitation-only footer) · / post-login fan-out (0→/no-access, 1→direct,
+  n→/select picker) · app/[tenant]/layout.tsx validates slug vs.
+  memberships (404) and renders the shell (topbar: logo, tenant name,
+  Meine Arbeit, search stub, avatar menu with theme toggle/tenant
+  switcher/logout/log out everywhere) · minimal branch-list glance
+  placeholder (real glance in M6) · globals.css carries the full handover
+  §2 token table (light+dark), Instrument Sans via next/font.
+- Playwright (6 e2e, green): unauth redirect; OTP happy path via file
+  mail → picker → tenant; 5-wrong-attempts kills the code (correct one
+  refused after); SSO-enforced domain gets no OTP and no mail; MB
+  switches tenants and the tree swaps completely; IK deep-linking to
+  /nebenwerk gets 404.
+
+**Caveats / follow-ups**
+
+- OIDC e2e (mocked IdP) deferred — see DECISIONS; Entra config itself is
+  complete and gated on env.
+- Invitation MAIL sending is not yet wired to a UI (invite_member exists
+  since M2; the admin screen in M8 will call it and send
+  strings.invitation via lib/mail.ts).
+- Playwright here uses the runner's Chromium via PLAYWRIGHT_CHROMIUM env
+  (playwright.config.ts); normal setups just `playwright install`.
+- Search field in the topbar is a stub (M7); "Meine Arbeit" page is a
+  placeholder (M7).
+- Next: M5 — alarm evaluation SQL function invoked by the worker,
+  stagnation/due-soon rules (§6), alarm events + alarm_state_cached
+  escalation, time-mocked scenario matrix.
