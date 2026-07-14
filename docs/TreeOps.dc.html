@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Instrument Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased;--bg:#F6F5F1;--surface:#FFFFFF;--surface2:#FBFAF7;--border:#E8E4DB;--border2:#F1EEE7;--track:#ECE8DF;--chipbg:#F1EFE9;--ink:#211F1A;--btn:#211F1A;--btnfg:#FFFFFF;--text2:#3A3730;--text3:#4A463D;--mut:#6E6A60;--mut2:#7A756A;--mut3:#8A8578;--faint:#A39D8F;--faint2:#B5AF9F;--faint3:#C8C2B2;--hoverbd:#CBC5B7;--dashed:#D5CFC0;--plum:#6E4E9E;--blue:#2F6098;--teal:#1F8A6E;--tealh:#14705A;--al-stag:#8F6E1E;--al-due:#A85414;--al-over:#B3361E;--teams:#4B53A8;--aibg:#FAF8FD;--aibd:#E5DEF1}
+body[data-theme="dark"]{--bg:#161511;--surface:#201E19;--surface2:#1B1915;--border:#33302A;--border2:#2A2722;--track:#2E2B25;--chipbg:#2A2722;--ink:#E9E6DC;--btn:#E9E6DC;--btnfg:#1B1915;--text2:#CCC8BB;--text3:#B9B5A7;--mut:#9C978A;--mut2:#8F8A7D;--mut3:#857F72;--faint:#6E6960;--faint2:#5C574D;--faint3:#4A463E;--hoverbd:#4A4639;--dashed:#3E3A31;--plum:#B195E0;--blue:#82ABD8;--teal:#46B893;--tealh:#5FCCA8;--al-stag:#CFA83E;--al-due:#E0863E;--al-over:#E4674A;--teams:#9BA1E8;--aibg:#221F2C;--aibd:#39334D}
+a{color:var(--teal);text-decoration:none}a:hover{color:var(--tealh)}
+input{font-family:'Instrument Sans',system-ui,sans-serif}
+@keyframes vfade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+@keyframes vzoom{from{opacity:0;transform:scale(.93)}to{opacity:1;transform:scale(1)}}
+</style>
+</helmet>
+<div style="min-height:100vh;display:flex;flex-direction:column">
+<sc-if value="{{ showChrome }}" hint-placeholder-val="{{ true }}">
+<div style="height:52px;background:var(--surface2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:20px;padding:0 24px;flex:none">
+  <div onClick="{{ goHome }}" style="display:flex;align-items:center;gap:8px;cursor:pointer">
+    <svg width="18" height="18" viewBox="0 0 18 18"><rect x="1" y="1" width="16" height="16" rx="4" style="fill:var(--ink)"></rect><rect x="4.5" y="4.5" width="9" height="2.2" rx="1.1" style="fill:var(--bg)"></rect><rect x="6.5" y="8" width="7" height="2.2" rx="1.1" fill="#C98A2B"></rect><rect x="8.5" y="11.5" width="5" height="2.2" rx="1.1" style="fill:var(--teal)"></rect></svg>
+    <span style="font-weight:650;font-size:14.5px;letter-spacing:-0.01em">TreeOps</span>
+  </div>
+  <div style="flex:1;max-width:420px;height:30px;border:1px solid var(--border);background:var(--surface);border-radius:7px;display:flex;align-items:center;gap:7px;padding:0 10px;color:var(--faint);font-size:12.5px">
+    <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="7" cy="7" r="4.5"></circle><line x1="10.5" y1="10.5" x2="14" y2="14"></line></svg>
+    Suchen … <span style="margin-left:auto;border:1px solid var(--border);border-radius:4px;padding:0 5px;font-size:10.5px">/</span>
+  </div>
+  <div style="flex:1"></div>
+  <span onClick="{{ goMyWork }}" style="font-size:13px;font-weight:{{ myWorkW }};color:{{ myWorkC }};cursor:pointer">Meine Arbeit</span>
+  <span onClick="{{ toggleTheme }}" title="Hell / Dunkel" style="width:26px;height:26px;border-radius:7px;border:1px solid var(--border);display:inline-flex;align-items:center;justify-content:center;color:var(--mut);cursor:pointer;background:var(--surface)" style-hover="border-color:var(--hoverbd)">
+    <sc-if value="{{ isDark }}" hint-placeholder-val="{{ false }}"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="3.2"></circle><line x1="8" y1="1.5" x2="8" y2="3"></line><line x1="8" y1="13" x2="8" y2="14.5"></line><line x1="1.5" y1="8" x2="3" y2="8"></line><line x1="13" y1="8" x2="14.5" y2="8"></line><line x1="3.4" y1="3.4" x2="4.5" y2="4.5"></line><line x1="11.5" y1="11.5" x2="12.6" y2="12.6"></line><line x1="3.4" y1="12.6" x2="4.5" y2="11.5"></line><line x1="11.5" y1="4.5" x2="12.6" y2="3.4"></line></svg></sc-if>
+    <sc-if value="{{ isLight }}" hint-placeholder-val="{{ true }}"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 9.5 A6 6 0 1 1 6.5 2.5 A5 5 0 0 0 13.5 9.5 Z"></path></svg></sc-if>
+  </span>
+  <div onClick="{{ goLogin }}" title="Login-Ansicht (Prototyp)" style="width:28px;height:28px;border-radius:999px;background:#5B6C8F;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;cursor:pointer">MB</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isGlance }}" hint-placeholder-val="{{ true }}">
+<div style="max-width:1240px;width:100%;margin:0 auto;padding:30px 36px 48px;box-sizing:border-box;animation:vfade .18s ease">
+  <div style="display:flex;align-items:baseline;gap:14px;margin-bottom:20px;flex-wrap:wrap">
+    <h1 style="margin:0;font-size:22px;font-weight:650;letter-spacing:-0.015em">Überblick</h1>
+    <span style="font-size:13px;color:var(--mut3)">Forsit Holding · 6 Bereiche · Dienstag, 14. Juli</span>
+    <div style="margin-left:auto;display:flex;gap:16px;align-items:center;font-size:11.5px;color:var(--mut3)">
+      <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:22px;height:4px;border-radius:2px;background:linear-gradient(90deg,#A19B8F,#C98A2B,var(--teal))"></span>Fortschritt</span>
+      <span style="display:inline-flex;align-items:center;gap:5px;color:var(--plum)"><svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="8" r="6"></circle><line x1="4.5" y1="11.5" x2="11.5" y2="4.5"></line></svg><span style="color:var(--mut3)">blockiert</span></span>
+      <span style="display:inline-flex;align-items:center;gap:5px;color:var(--al-over)"><svg width="11" height="11" viewBox="0 0 16 16"><path d="M8 2 L14.5 13.5 H1.5 Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"></path></svg><span style="color:var(--mut3)">Alarm</span></span>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(12,1fr);grid-auto-rows:150px;gap:14px;grid-auto-flow:dense">
+    <sc-for list="{{ cards }}" as="card" hint-placeholder-count="4">
+    <div onClick="{{ card.open }}" style="grid-column:span {{ card.span }};grid-row:span {{ card.rows }};background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:16px 18px 15px;display:flex;flex-direction:column;cursor:pointer;min-width:0;transition:border-color .12s,box-shadow .12s" style-hover="border-color:var(--hoverbd);box-shadow:0 3px 14px rgba(40,35,20,.07)">
+      <div style="display:flex;align-items:flex-start;gap:8px">
+        <div style="min-width:0;flex:1">
+          <div style="font-weight:600;font-size:15px;letter-spacing:-0.01em;line-height:1.25">{{ card.name }}</div>
+          <div style="font-size:12px;color:var(--mut3);margin-top:3px">{{ card.depthHint }}</div>
+        </div>
+        <span onClick="{{ card.toggle }}" title="{{ card.toggleHint }}" style="flex:none;width:22px;height:22px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;color:var(--faint2);cursor:pointer;border:1px solid transparent" style-hover="color:var(--mut);border-color:var(--border);background:var(--surface2)">
+          <sc-if value="{{ card.big }}" hint-placeholder-val="{{ false }}"><svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6.5 2.5 H2.5 V6.5"></path><path d="M9.5 13.5 H13.5 V9.5"></path><line x1="2.5" y1="2.5" x2="6.5" y2="6.5"></line><line x1="13.5" y1="13.5" x2="9.5" y2="9.5"></line></svg></sc-if>
+          <sc-if value="{{ card.small }}" hint-placeholder-val="{{ false }}"><svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9.5 2.5 H13.5 V6.5"></path><path d="M6.5 13.5 H2.5 V9.5"></path><line x1="13.5" y1="2.5" x2="9.5" y2="6.5"></line><line x1="2.5" y1="13.5" x2="6.5" y2="9.5"></line></svg></sc-if>
+        </span>
+      </div>
+      <sc-if value="{{ card.hasSignals }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:8px">
+          <sc-if value="{{ card.blocked }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--plum);background:rgba(122,94,168,.09);border:1px solid rgba(122,94,168,.28);padding:2px 8px;border-radius:999px"><svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="8" r="6"></circle><line x1="4.5" y1="11.5" x2="11.5" y2="4.5"></line></svg>blockiert</span></sc-if>
+          <sc-if value="{{ card.hasAlarm }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:{{ card.alarmC }};background:{{ card.alarmBg }};border:1px solid {{ card.alarmBd }};padding:2px 8px;border-radius:999px"><svg width="11" height="11" viewBox="0 0 16 16"><path d="M8 2 L14.5 13.5 H1.5 Z" fill="{{ card.alarmFill }}" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"></path></svg>{{ card.alarmLabel }}</span></sc-if>
+        </div>
+      </sc-if>
+      <div style="flex:1"></div>
+      <sc-if value="{{ card.hasKids }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:7px;margin:10px 0 14px;border-top:1px solid var(--border2);padding-top:12px">
+          <sc-for list="{{ card.kids }}" as="kid" hint-placeholder-count="0">
+          <div style="display:flex;align-items:center;gap:8px;font-size:12.5px">
+            <span style="color:var(--text3);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ kid.name }}</span>
+            <sc-if value="{{ kid.blocked }}" hint-placeholder-val="{{ false }}"><svg style="color:var(--plum)" width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="8" r="6"></circle><line x1="4.5" y1="11.5" x2="11.5" y2="4.5"></line></svg></sc-if>
+            <sc-if value="{{ kid.hasAlarm }}" hint-placeholder-val="{{ false }}"><svg width="11" height="11" viewBox="0 0 16 16"><path d="M8 2 L14.5 13.5 H1.5 Z" fill="{{ kid.alarmFill }}" stroke="currentColor" style="color:{{ kid.alarmC }}" stroke-width="1.8" stroke-linejoin="round"></path></svg></sc-if>
+            <span style="width:56px;height:3px;border-radius:2px;background:var(--track);overflow:hidden;flex:none"><span style="display:block;height:100%;width:{{ kid.pct }}%;background:{{ kid.color }}"></span></span>
+            <span style="width:34px;text-align:right;font-weight:600;color:{{ kid.color }};font-feature-settings:'tnum'">{{ kid.pctLabel }}</span>
+          </div>
+          </sc-for>
+        </div>
+      </sc-if>
+      <div style="display:flex;align-items:flex-end;gap:12px">
+        <div style="font-size:{{ card.numSize }}px;font-weight:650;letter-spacing:-0.03em;line-height:1;color:{{ card.numColor }};font-feature-settings:'tnum'">{{ card.pctLabel }}</div>
+        <sc-if value="{{ card.isEmpty }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px;color:var(--faint);padding-bottom:2px">noch nicht gestartet</span></sc-if>
+      </div>
+      <div style="height:4px;border-radius:2px;background:var(--track);margin-top:9px;overflow:hidden;border:{{ card.trackBorder }}"><div style="height:100%;width:{{ card.pct }}%;background:{{ card.color }};border-radius:2px"></div></div>
+    </div>
+    </sc-for>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isBranch }}" hint-placeholder-val="{{ false }}">
+<div style="max-width:1080px;width:100%;margin:0 auto;padding:24px 36px 48px;box-sizing:border-box;animation:vzoom .24s cubic-bezier(.2,.8,.2,1);transform-origin:{{ zoomOrigin }}">
+  <div style="display:flex;align-items:center;gap:6px;font-size:12.5px;margin-bottom:16px;flex-wrap:wrap">
+    <sc-for list="{{ crumbs }}" as="crumb" hint-placeholder-count="2">
+      <span onClick="{{ crumb.go }}" title="{{ crumb.hint }}" style="color:{{ crumb.color }};cursor:{{ crumb.cursor }};font-weight:{{ crumb.weight }};border-bottom:{{ crumb.underline }};padding-bottom:1px">{{ crumb.name }}<sc-if value="{{ crumb.pctLabel }}" hint-placeholder-val="{{ false }}"><span style="color:var(--faint2);font-weight:400;font-feature-settings:'tnum'"> · {{ crumb.pctLabel }}</span></sc-if></span>
+      <sc-if value="{{ crumb.sep }}" hint-placeholder-val="{{ true }}"><span style="color:var(--faint3)">›</span></sc-if>
+    </sc-for>
+  </div>
+  <div style="display:flex;align-items:flex-start;gap:24px;margin-bottom:26px;flex-wrap:wrap">
+    <div style="min-width:0;flex:1">
+      <h1 style="margin:0;font-size:21px;font-weight:650;letter-spacing:-0.015em">{{ branch.name }}</h1>
+      <div style="font-size:13px;color:var(--mut3);margin-top:4px">{{ branch.depthHint }}</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:14px;flex:none">
+      <div style="display:flex;gap:5px">
+        <sc-if value="{{ branch.blocked }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--plum);background:rgba(122,94,168,.09);border:1px solid rgba(122,94,168,.28);padding:2px 8px;border-radius:999px"><svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="8" r="6"></circle><line x1="4.5" y1="11.5" x2="11.5" y2="4.5"></line></svg>blockiert</span></sc-if>
+        <sc-if value="{{ branch.hasAlarm }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:{{ branch.alarmC }};background:{{ branch.alarmBg }};border:1px solid {{ branch.alarmBd }};padding:2px 8px;border-radius:999px"><svg width="11" height="11" viewBox="0 0 16 16"><path d="M8 2 L14.5 13.5 H1.5 Z" fill="{{ branch.alarmFill }}" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"></path></svg>{{ branch.alarmLabel }}</span></sc-if>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:26px;font-weight:650;letter-spacing:-0.02em;color:{{ branch.numColor }};font-feature-settings:'tnum'">{{ branch.pctLabel }}</div>
+        <div style="width:150px;height:4px;border-radius:2px;background:var(--track);margin-top:6px;overflow:hidden"><div style="height:100%;width:{{ branch.pct }}%;background:{{ branch.color }}"></div></div>
+      </div>
+    </div>
+  </div>
+  <sc-if value="{{ hasSubs }}" hint-placeholder-val="{{ false }}">
+    <div style="font-size:11px;font-weight:650;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);margin:0 0 10px">Teilbereiche</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-bottom:30px">
+      <sc-for list="{{ subs }}" as="sub" hint-placeholder-count="3">
+      <div onClick="{{ sub.open }}" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;cursor:pointer;min-width:0;transition:border-color .12s,box-shadow .12s" style-hover="border-color:var(--hoverbd);box-shadow:0 3px 12px rgba(40,35,20,.07)">
+        <div style="display:flex;align-items:flex-start;gap:8px">
+          <div style="font-weight:600;font-size:13.5px;flex:1;min-width:0;line-height:1.3">{{ sub.name }}</div>
+          <sc-if value="{{ sub.blocked }}" hint-placeholder-val="{{ false }}"><svg style="flex:none;margin-top:2px;color:var(--plum)" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="8" r="6"></circle><line x1="4.5" y1="11.5" x2="11.5" y2="4.5"></line></svg></sc-if>
+          <sc-if value="{{ sub.hasAlarm }}" hint-placeholder-val="{{ false }}"><svg style="flex:none;margin-top:2px" width="12" height="12" viewBox="0 0 16 16"><path d="M8 2 L14.5 13.5 H1.5 Z" fill="{{ sub.alarmFill }}" stroke="currentColor" style="color:{{ sub.alarmC }}" stroke-width="1.8" stroke-linejoin="round"></path></svg></sc-if>
+        </div>
+        <div style="font-size:11.5px;color:var(--mut3);margin-top:2px">{{ sub.depthHint }}</div>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:12px">
+          <div style="flex:1;height:4px;border-radius:2px;background:var(--track);overflow:hidden"><div style="height:100%;width:{{ sub.pct }}%;background:{{ sub.color }}"></div></div>
+          <div style="font-size:14px;font-weight:650;color:{{ sub.numColor }};font-feature-settings:'tnum'">{{ sub.pctLabel }}</div>
+        </div>
+      </div>
+      </sc-for>
+    </div>
+  </sc-if>
+  <sc-if value="{{ branchEmpty }}" hint-placeholder-val="{{ false }}">
+    <div style="border:1.5px dashed var(--dashed);border-radius:12px;padding:40px 24px;text-align:center">
+      <div style="font-size:15px;font-weight:600;color:var(--mut)">Noch nichts hier</div>
+      <div style="font-size:12.5px;color:var(--faint);margin-top:6px;max-width:400px;margin-left:auto;margin-right:auto;line-height:1.6;text-wrap:pretty">Dieser Bereich ist angelegt, aber noch leer. Sobald Aufgaben entstehen und Zeit erfasst wird, erscheint hier der Fortschritt — bis dahin zeigt die Karte bewusst „—" statt 0 %.</div>
+      <div style="display:inline-flex;margin-top:16px;font-size:12.5px;font-weight:600;color:var(--text3);border:1px solid var(--border);border-radius:8px;padding:7px 14px;cursor:pointer;background:var(--surface)" style-hover="border-color:var(--hoverbd)">+ Erste Aufgabe anlegen</div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ notBranchEmpty }}" hint-placeholder-val="{{ true }}">
+  <div style="display:flex;align-items:center;gap:10px;margin:0 0 10px;flex-wrap:wrap">
+    <div style="font-size:11px;font-weight:650;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);margin-right:auto">Aufgaben</div>
+    <div style="display:flex;gap:4px">
+      <sc-for list="{{ alarmFilters }}" as="f" hint-placeholder-count="0">
+        <span onClick="{{ f.set }}" style="font-size:12px;font-weight:550;padding:4px 11px;border-radius:999px;cursor:pointer;border:1px solid {{ f.bd }};background:{{ f.bg }};color:{{ f.c }}">{{ f.label }}</span>
+      </sc-for>
+    </div>
+    <div style="width:1px;height:18px;background:var(--border)"></div>
+    <div style="display:flex;gap:4px">
+      <sc-for list="{{ personFilters }}" as="pf" hint-placeholder-count="0">
+        <span onClick="{{ pf.set }}" title="{{ pf.name }}" style="width:26px;height:26px;border-radius:999px;background:{{ pf.bg }};color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:600;cursor:pointer;border:2px solid {{ pf.ring }};box-sizing:border-box;opacity:{{ pf.opacity }}">{{ pf.initials }}</span>
+      </sc-for>
+    </div>
+  </div>
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:11px;overflow:hidden">
+    <sc-for list="{{ rows }}" as="row" hint-placeholder-count="4">
+    <div onClick="{{ row.open }}" style="display:flex;align-items:center;gap:12px;padding:11px 16px;border-bottom:1px solid var(--border2);cursor:pointer;min-width:0" style-hover="background:var(--surface2)">
+      <span style="flex:none;font-size:11px;font-weight:600;color:{{ row.stC }};background:{{ row.stBg }};padding:2px 8px;border-radius:999px;width:60px;text-align:center">{{ row.stLabel }}</span>
+      <span style="flex:1;min-width:0;font-size:13.5px;font-weight:550;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ row.title }}</span>
+      <sc-if value="{{ row.blocked }}" hint-placeholder-val="{{ false }}"><svg style="flex:none;color:var(--plum)" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="8" r="6"></circle><line x1="4.5" y1="11.5" x2="11.5" y2="4.5"></line></svg></sc-if>
+      <sc-if value="{{ row.hasAlarm }}" hint-placeholder-val="{{ false }}"><span title="{{ row.alarmLabel }}" style="flex:none;display:inline-flex"><svg width="12" height="12" viewBox="0 0 16 16"><path d="M8 2 L14.5 13.5 H1.5 Z" fill="{{ row.alarmFill }}" stroke="currentColor" style="color:{{ row.alarmC }}" stroke-width="1.8" stroke-linejoin="round"></path></svg></span></sc-if>
+      <span style="flex:none;width:44px;height:3px;border-radius:2px;background:var(--track);overflow:hidden"><span style="display:block;height:100%;width:{{ row.pct }}%;background:{{ row.color }}"></span></span>
+      <span style="flex:none;width:36px;text-align:right;font-size:12.5px;font-weight:600;color:{{ row.numColor }};font-feature-settings:'tnum'">{{ row.pctLabel }}</span>
+      <span title="{{ row.respName }}" style="flex:none;width:22px;height:22px;border-radius:999px;background:{{ row.respBg }};color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:600">{{ row.resp }}</span>
+      <span style="flex:none;width:52px;font-size:12px;color:{{ row.dueC }};font-weight:{{ row.dueW }};font-feature-settings:'tnum'">{{ row.due }}</span>
+      <span style="flex:none;width:88px;text-align:right;font-size:11.5px;color:var(--faint)">{{ row.last }}</span>
+    </div>
+    </sc-for>
+    <sc-if value="{{ rowsEmpty }}" hint-placeholder-val="{{ false }}"><div style="padding:26px 16px;text-align:center;font-size:13px;color:var(--faint)">Keine Aufgaben für diesen Filter.</div></sc-if>
+  </div>
+  </sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ isTask }}" hint-placeholder-val="{{ false }}">
+<div style="max-width:1080px;width:100%;margin:0 auto;padding:24px 36px 56px;box-sizing:border-box;animation:vfade .18s ease">
+  <div style="display:flex;align-items:center;gap:6px;font-size:12.5px;margin-bottom:14px;flex-wrap:wrap">
+    <sc-for list="{{ crumbs }}" as="crumb" hint-placeholder-count="2">
+      <span onClick="{{ crumb.go }}" title="{{ crumb.hint }}" style="color:{{ crumb.color }};cursor:{{ crumb.cursor }};font-weight:{{ crumb.weight }};border-bottom:{{ crumb.underline }};padding-bottom:1px">{{ crumb.name }}</span>
+      <sc-if value="{{ crumb.sep }}" hint-placeholder-val="{{ true }}"><span style="color:var(--faint3)">›</span></sc-if>
+    </sc-for>
+  </div>
+  <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:22px">
+    <h1 style="margin:0;font-size:20px;font-weight:650;letter-spacing:-0.015em;line-height:1.3;flex:1;min-width:0">{{ task.title }}</h1>
+    <sc-if value="{{ task.blocked }}" hint-placeholder-val="{{ false }}"><span style="flex:none;display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--plum);background:rgba(122,94,168,.09);border:1px solid rgba(122,94,168,.28);padding:3px 9px;border-radius:999px;margin-top:2px"><svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="8" r="6"></circle><line x1="4.5" y1="11.5" x2="11.5" y2="4.5"></line></svg>blockiert</span></sc-if>
+    <sc-if value="{{ task.hasAlarm }}" hint-placeholder-val="{{ false }}"><span style="flex:none;display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:{{ task.alarmC }};background:{{ task.alarmBg }};border:1px solid {{ task.alarmBd }};padding:3px 9px;border-radius:999px;margin-top:2px"><svg width="11" height="11" viewBox="0 0 16 16"><path d="M8 2 L14.5 13.5 H1.5 Z" fill="{{ task.alarmFill }}" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"></path></svg>{{ task.alarmLabel }}</span></sc-if>
+  </div>
+  <div style="display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:28px;align-items:start">
+    <div style="min-width:0;display:flex;flex-direction:column;gap:26px">
+      <div>
+        <div style="font-size:11px;font-weight:650;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);margin-bottom:9px">Beschreibung</div>
+        <sc-if value="{{ hasDesc }}" hint-placeholder-val="{{ true }}"><div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px;font-size:13.5px;line-height:1.65;color:var(--text2);text-wrap:pretty">{{ task.desc }}</div></sc-if>
+        <sc-if value="{{ noDesc }}" hint-placeholder-val="{{ false }}"><div style="border:1.5px dashed var(--dashed);border-radius:10px;padding:16px 18px;font-size:12.5px;line-height:1.6;color:var(--faint);text-wrap:pretty">Noch keine Beschreibung. Hier gehört der von Menschen geschriebene Kontext hin — dieser Text wird nie von Maschinen bearbeitet.</div></sc-if>
+      </div>
+      <div>
+        <div style="font-size:11px;font-weight:650;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);margin-bottom:9px">Informationsstrom</div>
+        <sc-if value="{{ noInfos }}" hint-placeholder-val="{{ false }}"><div style="border:1.5px dashed var(--dashed);border-radius:10px;padding:16px 18px;font-size:12.5px;line-height:1.6;color:var(--faint);text-wrap:pretty">Noch keine Einträge. Manuelle Notizen, erfasste Teams-Threads und KI-Zusammenfassungen erscheinen hier — chronologisch, unveränderlich, mit Quellen-Badge.</div></sc-if>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <sc-for list="{{ infos }}" as="info" hint-placeholder-count="2">
+          <div style="background:{{ info.bg }};border:1px solid {{ info.bd }};border-radius:10px;padding:12px 15px">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">
+              <span style="display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:650;letter-spacing:.02em;color:{{ info.badgeC }};background:{{ info.badgeBg }};padding:2px 8px;border-radius:5px">
+                <sc-if value="{{ info.isAi }}" hint-placeholder-val="{{ false }}"><svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1 L9.6 6.4 L15 8 L9.6 9.6 L8 15 L6.4 9.6 L1 8 L6.4 6.4 Z"></path></svg></sc-if>
+                {{ info.badge }}
+              </span>
+              <span style="font-size:12px;font-weight:600;color:var(--text2)">{{ info.author }}</span>
+              <span style="font-size:11.5px;color:var(--faint)">{{ info.time }}</span>
+              <sc-if value="{{ info.link }}" hint-placeholder-val="{{ false }}"><a href="#" onClick="{{ noop }}" style="font-size:11.5px;margin-left:auto">Thread öffnen ↗</a></sc-if>
+            </div>
+            <div style="font-size:13px;line-height:1.6;color:var(--text2);text-wrap:pretty">{{ info.text }}</div>
+          </div>
+          </sc-for>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:11px;font-weight:650;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);margin-bottom:9px">Diskussion</div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:6px 18px">
+          <sc-if value="{{ noComments }}" hint-placeholder-val="{{ false }}"><div style="padding:12px 0 4px;font-size:12.5px;color:var(--faint)">Noch keine Kommentare.</div></sc-if>
+          <sc-for list="{{ comments }}" as="cm" hint-placeholder-count="1">
+          <div style="display:flex;gap:10px;padding:12px 0;border-bottom:1px solid var(--border2)">
+            <span style="flex:none;width:26px;height:26px;border-radius:999px;background:{{ cm.bg }};color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:600">{{ cm.initials }}</span>
+            <div style="min-width:0">
+              <div style="font-size:12.5px;margin-bottom:2px"><span style="font-weight:600">{{ cm.name }}</span> <span style="color:var(--faint);font-size:11.5px">{{ cm.time }}</span></div>
+              <div style="font-size:13px;line-height:1.55;color:var(--text2);text-wrap:pretty">{{ cm.text }}</div>
+            </div>
+          </div>
+          </sc-for>
+          <div style="display:flex;gap:10px;padding:12px 0;align-items:center">
+            <span style="flex:none;width:26px;height:26px;border-radius:999px;background:#5B6C8F;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:600">MB</span>
+            <input value="{{ draft }}" onChange="{{ setDraft }}" placeholder="Kommentar schreiben …" style="flex:1;border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;outline:none;background:var(--surface2)"></input>
+            <span onClick="{{ sendComment }}" style="flex:none;font-size:12.5px;font-weight:600;color:#fff;background:var(--ink);border-radius:8px;padding:8px 14px;cursor:pointer">Senden</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:11px;font-weight:650;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);margin-bottom:9px">Aktivität</div>
+        <div style="display:flex;flex-direction:column;gap:0;border-left:2px solid var(--track);margin-left:5px;padding-left:14px">
+          <sc-for list="{{ activity }}" as="ev" hint-placeholder-count="2">
+          <div style="padding:6px 0;font-size:12.5px;color:var(--mut)"><span style="color:var(--text2)">{{ ev.text }}</span> <span style="color:var(--faint2);font-size:11.5px">· {{ ev.who }} · {{ ev.time }}</span></div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:16px 16px 18px">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="width:28px;height:28px;border-radius:999px;background:{{ task.respBg }};color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:600">{{ task.resp }}</span>
+            <div><div style="font-size:13px;font-weight:600">{{ task.respName }}</div><div style="font-size:11px;color:var(--faint)">Verantwortlich</div></div>
+            <div style="margin-left:auto;text-align:right"><div style="font-size:13px;font-weight:600;color:{{ task.dueC }};font-feature-settings:'tnum'">{{ task.dueLong }}</div><div style="font-size:11px;color:var(--faint)">Fällig</div></div>
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:650;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);margin-bottom:6px">Status</div>
+            <div style="display:flex;gap:4px">
+              <sc-for list="{{ statusOpts }}" as="st" hint-placeholder-count="0">
+              <span onClick="{{ st.set }}" style="flex:{{ st.flex }};text-align:center;font-size:11.5px;font-weight:600;padding:7px 2px;border-radius:8px;cursor:pointer;border:1px solid {{ st.bd }};background:{{ st.bg }};color:{{ st.c }};margin-left:{{ st.ml }}px;white-space:nowrap">{{ st.label }}</span>
+              </sc-for>
+            </div>
+            <sc-if value="{{ blockedNote }}" hint-placeholder-val="{{ false }}"><div style="font-size:11.5px;color:var(--plum);margin-top:7px;line-height:1.5">Blockiert unterdrückt den Stagnations-Alarm — das Problem ist sichtbar markiert.</div></sc-if>
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:650;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);margin-bottom:6px">Fortschritt</div>
+            <div style="display:flex;gap:4px">
+              <sc-for list="{{ pctSegs }}" as="seg" hint-placeholder-count="0">
+              <span onClick="{{ seg.set }}" style="flex:1;text-align:center;font-size:11.5px;font-weight:600;padding:9px 0;border-radius:7px;cursor:{{ seg.cursor }};border:1px solid {{ seg.bd }};background:{{ seg.bg }};color:{{ seg.c }};font-feature-settings:'tnum'">{{ seg.label }}</span>
+              </sc-for>
+            </div>
+            <sc-if value="{{ pctLocked }}" hint-placeholder-val="{{ false }}"><div style="font-size:11.5px;color:var(--teal);margin-top:7px">Bei „erledigt" fest auf 100 %.</div></sc-if>
+          </div>
+        </div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:16px">
+        <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:12px">
+          <div style="font-size:11px;font-weight:650;letter-spacing:.07em;text-transform:uppercase;color:var(--faint)">Zeit</div>
+          <div style="margin-left:auto;font-size:16px;font-weight:650;font-feature-settings:'tnum'">{{ timeTotal }}</div>
+          <div style="font-size:11px;color:var(--faint)">gesamt</div>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:9px">
+          <sc-for list="{{ timePresets }}" as="tp" hint-placeholder-count="0">
+          <span onClick="{{ tp.add }}" style="font-size:12px;font-weight:600;padding:5px 11px;border-radius:7px;border:1px solid var(--border);background:var(--surface2);color:var(--text3);cursor:pointer;font-feature-settings:'tnum'" style-hover="border-color:var(--hoverbd);background:var(--surface)">{{ tp.label }}</span>
+          </sc-for>
+        </div>
+        <div style="display:flex;gap:6px">
+          <input value="{{ freeTime }}" onChange="{{ setFreeTime }}" placeholder="frei, z. B. 45m" style="flex:1;min-width:0;border:1px solid var(--border);border-radius:7px;padding:6px 10px;font-size:12.5px;outline:none;background:var(--surface2)"></input>
+          <span onClick="{{ addFreeTime }}" style="flex:none;font-size:12px;font-weight:600;padding:6px 12px;border-radius:7px;background:var(--btn);color:var(--btnfg);cursor:pointer">Erfassen</span>
+        </div>
+        <sc-if value="{{ todayLabel }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px;color:var(--teal);font-weight:600;margin-top:9px;font-feature-settings:'tnum'">Heute erfasst: {{ todayLabel }}</div></sc-if>
+        <div style="border-top:1px solid var(--border2);margin-top:12px;padding-top:10px">
+          <div style="font-size:11px;color:var(--faint);margin-bottom:6px">Deine Einträge</div>
+          <sc-for list="{{ myLogs }}" as="lg" hint-placeholder-count="0">
+          <div style="display:flex;gap:8px;font-size:12px;color:var(--mut);padding:3px 0;font-feature-settings:'tnum'"><span style="color:var(--faint);width:44px">{{ lg.date }}</span><span style="font-weight:600;width:36px">{{ lg.dur }}</span><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ lg.note }}</span></div>
+          </sc-for>
+          <sc-if value="{{ noMyLogs }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px;color:var(--faint2)">— noch keine eigenen Einträge</div></sc-if>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isMyWork }}" hint-placeholder-val="{{ false }}">
+<div style="max-width:920px;width:100%;margin:0 auto;padding:30px 36px 48px;box-sizing:border-box;animation:vfade .18s ease">
+  <div style="margin-bottom:22px">
+    <h1 style="margin:0;font-size:22px;font-weight:650;letter-spacing:-0.015em">Meine Arbeit</h1>
+    <div style="font-size:13px;color:var(--mut3);margin-top:4px">Alles, wofür du verantwortlich bist — sortiert nach Dringlichkeit · Matthias B.</div>
+  </div>
+  <sc-if value="{{ hasMyAlarms }}" hint-placeholder-val="{{ false }}">
+    <div style="font-size:11px;font-weight:650;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);margin:0 0 10px">Meine Alarme</div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:11px;overflow:hidden;margin-bottom:26px">
+      <sc-for list="{{ myAlarms }}" as="al" hint-placeholder-count="1">
+      <div onClick="{{ al.open }}" style="display:flex;align-items:center;gap:12px;padding:11px 16px;border-bottom:1px solid var(--border2);cursor:pointer;min-width:0" style-hover="background:var(--surface2)">
+        <span style="flex:none;display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:{{ al.alarmC }};background:{{ al.alarmBg }};border:1px solid {{ al.alarmBd }};padding:2px 8px;border-radius:999px;width:78px;justify-content:center"><svg width="11" height="11" viewBox="0 0 16 16"><path d="M8 2 L14.5 13.5 H1.5 Z" fill="{{ al.alarmFill }}" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"></path></svg>{{ al.alarmLabel }}</span>
+        <span style="flex:1;min-width:0;font-size:13.5px;font-weight:550;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ al.title }}</span>
+        <span style="flex:none;font-size:11.5px;color:var(--faint)">{{ al.path }}</span>
+        <span style="flex:none;width:52px;text-align:right;font-size:12px;color:{{ al.dueC }};font-weight:{{ al.dueW }};font-feature-settings:'tnum'">{{ al.due }}</span>
+      </div>
+      </sc-for>
+    </div>
+  </sc-if>
+  <div style="font-size:11px;font-weight:650;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);margin:0 0 10px">Aufgaben</div>
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:11px;overflow:hidden">
+    <sc-for list="{{ myRows }}" as="row" hint-placeholder-count="4">
+      <sc-if value="{{ row.isHeader }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:7px 16px;font-size:10.5px;font-weight:650;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);background:var(--surface2);border-bottom:1px solid var(--border2)">{{ row.label }}</div>
+      </sc-if>
+      <sc-if value="{{ row.isRow }}" hint-placeholder-val="{{ true }}">
+      <div onClick="{{ row.open }}" style="display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border2);cursor:pointer;min-width:0" style-hover="background:var(--surface2)">
+        <span style="flex:none;font-size:11px;font-weight:600;color:{{ row.stC }};background:{{ row.stBg }};padding:2px 8px;border-radius:999px;width:60px;text-align:center">{{ row.stLabel }}</span>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13.5px;font-weight:550;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ row.title }}</div>
+          <div style="font-size:11.5px;color:var(--faint);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ row.path }}</div>
+        </div>
+        <sc-if value="{{ row.blocked }}" hint-placeholder-val="{{ false }}"><svg style="flex:none;color:var(--plum)" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="8" r="6"></circle><line x1="4.5" y1="11.5" x2="11.5" y2="4.5"></line></svg></sc-if>
+        <sc-if value="{{ row.hasAlarm }}" hint-placeholder-val="{{ false }}"><span title="{{ row.alarmLabel }}" style="flex:none;display:inline-flex"><svg width="12" height="12" viewBox="0 0 16 16"><path d="M8 2 L14.5 13.5 H1.5 Z" fill="{{ row.alarmFill }}" stroke="currentColor" style="color:{{ row.alarmC }}" stroke-width="1.8" stroke-linejoin="round"></path></svg></span></sc-if>
+        <span style="flex:none;width:44px;height:3px;border-radius:2px;background:var(--track);overflow:hidden"><span style="display:block;height:100%;width:{{ row.pct }}%;background:{{ row.color }}"></span></span>
+        <span style="flex:none;width:36px;text-align:right;font-size:12.5px;font-weight:600;color:{{ row.numColor }};font-feature-settings:'tnum'">{{ row.pctLabel }}</span>
+        <span style="flex:none;width:52px;font-size:12px;color:{{ row.dueC }};font-weight:{{ row.dueW }};font-feature-settings:'tnum'">{{ row.due }}</span>
+        <span style="flex:none;width:88px;text-align:right;font-size:11.5px;color:var(--faint)">{{ row.last }}</span>
+      </div>
+      </sc-if>
+    </sc-for>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isLogin }}" hint-placeholder-val="{{ false }}">
+<div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;box-sizing:border-box;animation:vfade .18s ease">
+  <div style="width:100%;max-width:396px;display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;align-items:center;gap:11px;background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:12px 15px">
+      <span style="flex:none;width:30px;height:30px;border-radius:999px;background:#5B6C8F;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:600">MB</span>
+      <div style="font-size:12.5px;line-height:1.5;color:var(--text2)"><span style="font-weight:600">Matthias B.</span> invited you to join <span style="font-weight:600">Forsit Holding</span> on TreeOps.</div>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:30px 28px">
+      <div style="display:flex;align-items:center;gap:9px;margin-bottom:18px">
+        <svg width="22" height="22" viewBox="0 0 18 18"><rect x="1" y="1" width="16" height="16" rx="4" style="fill:var(--ink)"></rect><rect x="4.5" y="4.5" width="9" height="2.2" rx="1.1" style="fill:var(--bg)"></rect><rect x="6.5" y="8" width="7" height="2.2" rx="1.1" fill="#C98A2B"></rect><rect x="8.5" y="11.5" width="5" height="2.2" rx="1.1" style="fill:var(--teal)"></rect></svg>
+        <span style="font-weight:650;font-size:17px;letter-spacing:-0.01em">TreeOps</span>
+      </div>
+      <sc-if value="{{ stepEmail }}" hint-placeholder-val="{{ true }}">
+        <div style="font-size:19px;font-weight:650;letter-spacing:-0.015em;margin-bottom:6px">Welcome</div>
+        <div style="font-size:13px;color:var(--mut);line-height:1.55;margin-bottom:18px;text-wrap:pretty">Sign in with your work email to accept the invitation.</div>
+        <input value="{{ loginEmail }}" onChange="{{ setLoginEmail }}" onKeyDown="{{ emailKey }}" placeholder="you@company.com" style="width:100%;box-sizing:border-box;border:1.5px solid var(--border);border-radius:9px;padding:11px 13px;font-size:14px;outline:none;background:var(--surface2);color:var(--ink)" style-focus="border-color:var(--ink)"></input>
+        <div onClick="{{ submitEmail }}" style="margin-top:10px;text-align:center;font-size:13.5px;font-weight:600;color:var(--btnfg);background:var(--btn);border-radius:9px;padding:11px;cursor:pointer">Continue with email</div>
+      </sc-if>
+      <sc-if value="{{ stepCode }}" hint-placeholder-val="{{ false }}">
+        <div style="font-size:19px;font-weight:650;letter-spacing:-0.015em;margin-bottom:6px">Check your inbox</div>
+        <div style="font-size:13px;color:var(--mut);line-height:1.55;text-wrap:pretty">We sent a 6-digit code to <span style="font-weight:600;color:var(--text2)">{{ loginEmail }}</span>. It expires in 10 minutes.</div>
+        <div style="display:flex;gap:8px;justify-content:center;margin:18px 0 8px">
+          <sc-for list="{{ codeBoxes }}" as="box" hint-placeholder-count="6">
+            <input value="{{ box.val }}" onChange="{{ box.onChange }}" onKeyDown="{{ box.onKey }}" ref="{{ box.setRef }}" maxLength="1" inputMode="numeric" autoComplete="one-time-code" style="width:44px;height:52px;text-align:center;font-size:22px;font-weight:600;border:1.5px solid var(--border);border-radius:10px;background:var(--surface2);color:var(--ink);outline:none;font-feature-settings:'tnum'" style-focus="border-color:var(--ink)"></input>
+          </sc-for>
+        </div>
+        <div style="text-align:center;font-size:12px;color:var(--faint)">Nothing arrived? <a href="#" onClick="{{ noop }}" style="cursor:pointer">Send a new code</a></div>
+      </sc-if>
+      <sc-if value="{{ stepDone }}" hint-placeholder-val="{{ false }}">
+        <div style="width:44px;height:44px;border-radius:999px;background:rgba(31,138,110,.12);display:flex;align-items:center;justify-content:center;margin-bottom:14px"><svg width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--teal)"><path d="M2.5 8.5 L6 12 L13.5 4.5"></path></svg></div>
+        <div style="font-size:19px;font-weight:650;letter-spacing:-0.015em;margin-bottom:6px">You're in.</div>
+        <div style="font-size:13px;color:var(--mut);line-height:1.55;margin-bottom:18px">Signed in as <span style="font-weight:600;color:var(--text2)">{{ loginEmail }}</span> — your tree is ready.</div>
+        <div onClick="{{ openApp }}" style="text-align:center;font-size:13.5px;font-weight:600;color:var(--btnfg);background:var(--btn);border-radius:9px;padding:11px;cursor:pointer">Open TreeOps</div>
+      </sc-if>
+      <sc-if value="{{ stepDone }}" hint-placeholder-val="{{ false }}"></sc-if>
+      <sc-if value="{{ stepEmail }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;align-items:center;gap:12px;margin:18px 0"><span style="flex:1;height:1px;background:var(--border)"></span><span style="font-size:11.5px;color:var(--faint)">or</span><span style="flex:1;height:1px;background:var(--border)"></span></div>
+        <div onClick="{{ msLogin }}" style="display:flex;align-items:center;justify-content:center;gap:9px;font-size:13.5px;font-weight:600;color:var(--text3);border:1.5px solid var(--border);border-radius:9px;padding:10px;cursor:pointer;background:var(--surface2)" style-hover="border-color:var(--hoverbd)">
+          <svg width="15" height="15" viewBox="0 0 16 16"><rect x="0.5" y="0.5" width="7" height="7" fill="#F25022"></rect><rect x="8.5" y="0.5" width="7" height="7" fill="#7FBA00"></rect><rect x="0.5" y="8.5" width="7" height="7" fill="#00A4EF"></rect><rect x="8.5" y="8.5" width="7" height="7" fill="#FFB900"></rect></svg>
+          Sign in with Microsoft
+        </div>
+      </sc-if>
+    </div>
+    <div style="text-align:center;font-size:11.5px;color:var(--faint);line-height:1.6">Invitation-only — there is no public sign-up.<br><a href="#" onClick="{{ noop }}" style="cursor:default"></a><span onClick="{{ goHome }}" style="cursor:pointer;color:var(--mut);text-decoration:underline;text-decoration-color:var(--dashed)">← Zurück zur App (Prototyp)</span></div>
+  </div>
+</div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;skeletonShowsProgress&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Sichtbarkeit&quot;},&quot;alarmSortGlance&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Überblick&quot;}}">
+class Component extends DCLogic {
+  state = { view: { k: 'glance' }, fA: 'all', fP: null, ov: {}, added: {}, extraComments: {}, draft: '', freeTime: '', theme: (() => { try { return localStorage.getItem('treeops.theme') === 'dark' ? 'dark' : 'light'; } catch (e) { return 'light'; } })(), login: { step: 'email', email: '' }, code: ['', '', '', '', '', ''], sizes: (() => { try { return JSON.parse(localStorage.getItem('treeops.cardSizes')) || {}; } catch (e) { return {}; } })() };
+
+  setSize(id, size) {
+    const sizes = { ...this.state.sizes, [id]: size };
+    this.setState({ sizes });
+    try { localStorage.setItem('treeops.cardSizes', JSON.stringify(sizes)); } catch (e) {}
+  }
+
+  componentDidMount() { this.applyTheme(); }
+
+  applyTheme() {
+    if (this.state.theme === 'dark') document.body.setAttribute('data-theme', 'dark');
+    else document.body.removeAttribute('data-theme');
+  }
+
+  data() {
+    if (this._d) return this._d;
+    const P = {
+      MB: { name: 'Matthias B.', bg: '#5B6C8F' }, IK: { name: 'Igor K.', bg: '#8F6E5B' },
+      MS: { name: 'Marlene S.', bg: '#6E8F5B' }, AD: { name: 'Aylin D.', bg: '#8F5B7C' }, JT: { name: 'Jonas T.', bg: '#5B8F8A' }
+    };
+    const B = {
+      root: { name: 'Forsit Holding', skeleton: true, pct: 58 },
+      mywell: { name: 'myWell', pct: 62, blocked: true, alarm: 'overdue', depth: '3 Teilbereiche · 24 Aufgaben', span: 6, rows: 2, parent: 'root', kids: ['relaunch', 'backend', 'website'], tasks: ['t1', 't2', 't3', 't4', 't5', 't6'] },
+      nordhof: { name: 'Nordhof Immobilien', pct: 34, alarm: 'stagnant', depth: '9 Aufgaben', span: 3, rows: 1, parent: 'root', kids: [], tasks: ['n1', 'n2', 'n3'] },
+      beratung: { name: 'Forsit Beratung', pct: 81, alarm: 'none', depth: '11 Aufgaben', span: 3, rows: 1, parent: 'root', kids: [], tasks: ['b1', 'b2'] },
+      werkbank: { name: 'Werkbank — internes Tooling', pct: 45, alarm: 'overdue', depth: '7 Aufgaben', span: 3, rows: 1, parent: 'root', kids: [], tasks: ['w1', 'w2', 'w3'] },
+      verwaltung: { name: 'Verwaltung & Finanzen', pct: 92, alarm: 'stagnant', depth: '5 Aufgaben', span: 3, rows: 1, parent: 'root', kids: [], tasks: ['v1', 'v2'] },
+      neuland: { name: 'Neuland Ventures', pct: null, alarm: 'none', depth: 'Noch keine Aufgaben', span: 3, rows: 1, parent: 'root', kids: [], tasks: [] },
+      relaunch: { name: 'App Relaunch 2.0', pct: 54, alarm: 'overdue', depth: '8 Aufgaben', parent: 'mywell', kids: [], tasks: ['r1', 'r2', 'r3'] },
+      backend: { name: 'Backend & API-Konsolidierung', pct: 71, blocked: true, alarm: 'none', depth: '9 Aufgaben', parent: 'mywell', kids: [], tasks: ['k1', 'k2'] },
+      website: { name: 'Marketing-Website Relaunch', pct: 88, alarm: 'none', depth: '7 Aufgaben', parent: 'mywell', kids: [], tasks: ['m1', 'm2'] }
+    };
+    const T = {
+      t1: {
+        branch: 'mywell', title: 'Zahlungsanbieter-Integration abschließen (Stripe → Mollie)', status: 'blocked', pct: 60, resp: 'IK', due: '17.07.', dueLong: '17. Juli 2026', dueSev: 'due_soon', alarm: 'none', last: 'vor 2 Tagen',
+        desc: 'Wechsel des Zahlungsanbieters von Stripe zu Mollie für den EU-Markt. Ziel ist der Go-live vor dem App-Store-Release 2.0. Umfasst den Checkout-Flow, die Webhook-Verarbeitung und die Migration bestehender Abonnements.',
+        infos: [
+          { src: 'manual', author: 'Matthias B.', time: 'vor 4 Tagen', text: 'Vertrag mit Mollie ist unterschrieben. Sandbox-Zugänge liegen im 1Password-Vault (Eintrag »Mollie Sandbox«).' },
+          { src: 'teams', author: 'Igor K.', time: 'vor 2 Tagen', link: true, text: 'Webhook-Signaturprüfung schlägt in der Sandbox fehl — Ticket bei Mollie eröffnet (#88231). Warten auf Rückmeldung des Supports.' },
+          { src: 'ai', author: 'aus Teams-Thread', time: 'vor 2 Tagen', text: 'Zusammenfassung des Threads (12 Nachrichten): Die Migration bestehender Abos ist getestet und funktioniert. Offen bleibt die fehlerhafte Webhook-Signatur in der Sandbox; der Mollie-Support ist eingebunden. Igor schlägt vor, den Go-live vom Support-Ticket zu entkoppeln.' }
+        ],
+        comments: [
+          { who: 'MS', time: 'gestern', text: 'Sollten wir den Release-Termin trotzdem halten? Marketing plant mit dem 24.07.' },
+          { who: 'IK', time: 'vor 22 Std.', text: 'Halte ich für riskant, solange #88231 offen ist. Entscheidung morgen im Jour fixe?' }
+        ],
+        total: '14 h 45 m', myLogs: [{ date: '13.07.', dur: '2 h', note: 'Webhook-Debugging' }, { date: '10.07.', dur: '4 h', note: 'Checkout-Flow umgebaut' }],
+        activity: [
+          { text: 'Status geändert: in Arbeit → blockiert', who: 'Igor K.', time: 'vor 2 Tagen' },
+          { text: 'Fortschritt geändert: 40 % → 60 %', who: 'Igor K.', time: 'vor 5 Tagen' },
+          { text: 'Verantwortung übergeben: Matthias B. → Igor K.', who: 'Matthias B.', time: 'vor 3 Wochen' },
+          { text: 'Aufgabe erstellt', who: 'Matthias B.', time: 'vor 6 Wochen' }
+        ]
+      },
+      t2: { branch: 'mywell', title: 'Datenschutzerklärung für App-Store-Release aktualisieren', status: 'in_progress', pct: 40, resp: 'MS', due: '21.07.', dueLong: '21. Juli 2026', alarm: 'none', last: 'gestern', desc: 'Anpassung der Datenschutzerklärung an die neuen App-Tracking-Hinweise. Abstimmung mit der Kanzlei Weidner & Partner läuft; finale Fassung muss vor dem Store-Review vorliegen.' },
+      t6: { branch: 'mywell', title: 'Barrierefreiheits-Prüfung nach BFSG für das Kundenportal durchführen und Maßnahmen dokumentieren', status: 'in_progress', pct: 20, resp: 'MS', due: '—', dueLong: 'kein Datum', alarm: 'none', last: 'vor 4 Tagen' },
+      t3: { branch: 'mywell', title: 'Onboarding-Flow: Abbruchquote analysieren', status: 'open', pct: 0, resp: 'AD', due: '24.07.', dueLong: '24. Juli 2026', alarm: 'stagnant', last: 'vor 9 Tagen' },
+      t4: { branch: 'mywell', title: 'Release-Notes 2.0 entwerfen', status: 'in_progress', pct: 80, resp: 'MB', due: '—', dueLong: 'kein Datum', alarm: 'none', last: 'heute' },
+      t5: { branch: 'mywell', title: 'Penetrationstest beauftragen', status: 'open', pct: 0, resp: 'IK', due: '15.07.', dueLong: '15. Juli 2026', dueSev: 'overdue', alarm: 'overdue', last: 'noch nie' },
+      n1: { branch: 'nordhof', title: 'Nebenkostenabrechnung 2025 fertigstellen', status: 'in_progress', pct: 40, resp: 'JT', due: '31.07.', dueLong: '31. Juli 2026', alarm: 'stagnant', last: 'vor 11 Tagen' },
+      n2: { branch: 'nordhof', title: 'Dachsanierung Bestandsgebäude: Angebote einholen und Fördermöglichkeiten (BEG) prüfen', status: 'open', pct: 20, resp: 'JT', due: '—', dueLong: 'kein Datum', alarm: 'stagnant', last: 'vor 8 Tagen' },
+      n3: { branch: 'nordhof', title: 'Mietvertrag Gewerbeeinheit EG verlängern', status: 'in_progress', pct: 60, resp: 'MB', due: '05.08.', dueLong: '5. August 2026', alarm: 'none', last: 'vor 3 Tagen' },
+      b1: { branch: 'beratung', title: 'Abschlussbericht Mandat Hensel & Co.', status: 'in_progress', pct: 80, resp: 'MB', due: '18.07.', dueLong: '18. Juli 2026', alarm: 'none', last: 'heute' },
+      b2: { branch: 'beratung', title: 'Workshop-Unterlagen Q3 vorbereiten', status: 'in_progress', pct: 80, resp: 'AD', due: '28.07.', dueLong: '28. Juli 2026', alarm: 'none', last: 'gestern' },
+      w1: { branch: 'werkbank', title: 'Zeiterfassungs-Export an DATEV anbinden', status: 'in_progress', pct: 40, resp: 'IK', due: '16.07.', dueLong: '16. Juli 2026', dueSev: 'due_soon', alarm: 'due_soon', last: 'vor 2 Tagen', desc: 'Export der Zeiteinträge im DATEV-Format (Phase 2 der Schnittstelle). Feldzuordnung ist mit dem Steuerbüro abzustimmen — Kontakt: Frau Held.' },
+      w2: { branch: 'werkbank', title: 'Backup-Strategie dokumentieren', status: 'open', pct: 20, resp: 'JT', due: '—', dueLong: 'kein Datum', alarm: 'none', last: 'vor 4 Tagen' },
+      w3: { branch: 'werkbank', title: 'Offsite-Agenda Q3 finalisieren', status: 'open', pct: 0, resp: 'MB', due: '13.07.', dueLong: '13. Juli 2026', dueSev: 'overdue', alarm: 'overdue', last: 'noch nie' },
+      v1: { branch: 'verwaltung', title: 'Jahresabschluss 2025: Unterlagen an Steuerbüro', status: 'done', pct: 100, resp: 'MB', due: '30.06.', dueLong: '30. Juni 2026', alarm: 'none', last: 'vor 2 Wochen' },
+      v2: { branch: 'verwaltung', title: 'Versicherungen konsolidieren', status: 'in_progress', pct: 80, resp: 'MB', due: '—', dueLong: 'kein Datum', alarm: 'stagnant', last: 'vor 12 Tagen' },
+      r1: { branch: 'relaunch', title: 'Neues Design-System in der App umsetzen', status: 'in_progress', pct: 60, resp: 'AD', due: '20.07.', dueLong: '20. Juli 2026', dueSev: 'due_soon', alarm: 'due_soon', last: 'heute' },
+      r2: { branch: 'relaunch', title: 'App-Store-Screenshots & Metadaten', status: 'open', pct: 0, resp: 'MS', due: '12.07.', dueLong: '12. Juli 2026', dueSev: 'overdue', alarm: 'overdue', last: 'noch nie' },
+      r3: { branch: 'relaunch', title: 'Beta-Feedback aus TestFlight auswerten', status: 'in_progress', pct: 40, resp: 'AD', due: '—', dueLong: 'kein Datum', alarm: 'none', last: 'vor 3 Tagen' },
+      k1: { branch: 'backend', title: 'Legacy-Endpunkte v1 abschalten', status: 'blocked', pct: 80, resp: 'IK', due: '—', dueLong: 'kein Datum', alarm: 'none', last: 'vor 6 Tagen' },
+      k2: { branch: 'backend', title: 'Rate-Limiting für öffentliche API', status: 'in_progress', pct: 60, resp: 'IK', due: '01.08.', dueLong: '1. August 2026', alarm: 'none', last: 'gestern' },
+      m1: { branch: 'website', title: 'Preisseite: neue Pakete abbilden', status: 'in_progress', pct: 80, resp: 'MS', due: '22.07.', dueLong: '22. Juli 2026', alarm: 'none', last: 'heute' },
+      m2: { branch: 'website', title: 'SEO-Audit umsetzen', status: 'done', pct: 100, resp: 'MS', due: '10.07.', dueLong: '10. Juli 2026', alarm: 'none', last: 'vor 4 Tagen' }
+    };
+    this._d = { P, B, T };
+    return this._d;
+  }
+
+  progColor(p) {
+    if (p == null) return 'var(--faint2)';
+    const stops = [[0, [161, 155, 143]], [45, [193, 138, 46]], [80, [31, 138, 110]], [100, [21, 118, 92]]];
+    for (let i = 0; i < stops.length - 1; i++) {
+      const [a, ca] = stops[i], [b, cb] = stops[i + 1];
+      if (p <= b) { const t = (p - a) / (b - a); return 'rgb(' + ca.map((v, j) => Math.round(v + (cb[j] - v) * t)).join(',') + ')'; }
+    }
+    return '#157658';
+  }
+
+  alarmMeta(kind) {
+    const m = {
+      stagnant: { label: 'stagniert', c: 'var(--al-stag)', bg: 'rgba(163,130,43,.10)', bd: 'rgba(163,130,43,.32)', fill: 'none' },
+      due_soon: { label: 'bald fällig', c: 'var(--al-due)', bg: 'rgba(180,94,20,.10)', bd: 'rgba(180,94,20,.32)', fill: 'none' },
+      overdue: { label: 'überfällig', c: 'var(--al-over)', bg: 'rgba(179,54,30,.10)', bd: 'rgba(179,54,30,.32)', fill: 'currentColor' }
+    };
+    return m[kind];
+  }
+
+  statusMeta(s) {
+    return {
+      open: { label: 'offen', c: 'var(--mut2)', bg: 'var(--chipbg)' },
+      in_progress: { label: 'in Arbeit', c: 'var(--blue)', bg: 'rgba(63,111,168,.11)' },
+      blocked: { label: 'blockiert', c: 'var(--plum)', bg: 'rgba(122,94,168,.11)' },
+      done: { label: 'erledigt', c: 'var(--teal)', bg: 'rgba(31,138,110,.11)' }
+    }[s];
+  }
+
+  signalFields(node) {
+    const am = node.alarm && node.alarm !== 'none' ? this.alarmMeta(node.alarm) : null;
+    return {
+      blocked: !!node.blocked, hasAlarm: !!am,
+      alarmLabel: am ? am.label : '', alarmC: am ? am.c : '', alarmBg: am ? am.bg : '', alarmBd: am ? am.bd : '', alarmFill: am ? am.fill : 'none',
+      pct: node.pct == null ? 0 : node.pct, pctLabel: node.pct == null ? '—' : node.pct + ' %',
+      color: this.progColor(node.pct), numColor: node.pct == null ? 'var(--faint2)' : this.progColor(node.pct)
+    };
+  }
+
+  taskState(id) {
+    const { T } = this.data();
+    const ov = this.state.ov[id] || {};
+    return { status: ov.status || T[id].status, pct: ov.pct != null ? ov.pct : T[id].pct };
+  }
+
+  crumbsFor(branchId, taskTitle) {
+    const { B } = this.data();
+    const chain = [];
+    let cur = branchId;
+    while (cur) { chain.unshift(cur); cur = B[cur].parent; }
+    const showPct = this.props.skeletonShowsProgress ?? true;
+    const items = chain.map((id, i) => {
+      const n = B[id], isLast = i === chain.length - 1 && !taskTitle;
+      const sk = !!n.skeleton;
+      return {
+        name: n.name, sep: !(isLast && !taskTitle) || !!taskTitle,
+        color: sk ? 'var(--faint2)' : (isLast ? 'var(--ink)' : 'var(--mut)'),
+        weight: isLast ? 600 : 500,
+        cursor: sk ? 'default' : 'pointer',
+        underline: sk ? '1px dashed var(--dashed)' : 'none',
+        hint: sk ? 'Nur Pfad sichtbar — kein Mitglied dieses Bereichs' : n.name,
+        pctLabel: sk && showPct && n.pct != null ? n.pct + ' %' : false,
+        go: sk ? undefined : () => this.setState({ view: { k: 'branch', id } })
+      };
+    });
+    if (taskTitle) items.push({ name: taskTitle, sep: false, color: 'var(--ink)', weight: 600, cursor: 'default', underline: 'none', hint: taskTitle, pctLabel: false });
+    else items[items.length - 1].sep = false;
+    return items;
+  }
+
+  fmtMin(min) {
+    const h = Math.floor(min / 60), m = min % 60;
+    return (h ? h + ' h ' : '') + (m ? m + ' m' : (h ? '' : '0 m'));
+  }
+
+  renderVals() {
+    const { P, B, T } = this.data();
+    const v = this.state.view;
+    const vals = {
+      isGlance: v.k === 'glance', isBranch: v.k === 'branch', isTask: v.k === 'task',
+      isMyWork: v.k === 'mywork', isLogin: v.k === 'login', showChrome: v.k !== 'login',
+      isDark: this.state.theme === 'dark', isLight: this.state.theme !== 'dark',
+      toggleTheme: () => {
+        const theme = this.state.theme === 'dark' ? 'light' : 'dark';
+        this.setState({ theme }, () => this.applyTheme());
+        try { localStorage.setItem('treeops.theme', theme); } catch (e) {}
+      },
+      goHome: () => this.setState({ view: { k: 'glance' }, fA: 'all', fP: null }),
+      goMyWork: () => this.setState({ view: { k: 'mywork' } }),
+      goLogin: () => this.setState({ view: { k: 'login' }, login: { step: 'email', email: '' }, code: ['', '', '', '', '', ''] }),
+      myWorkC: v.k === 'mywork' ? 'var(--ink)' : 'var(--mut2)', myWorkW: v.k === 'mywork' ? 600 : 400,
+      zoomOrigin: this.state.zoomOrigin || '50% 200px',
+      noop: (e) => e.preventDefault()
+    };
+
+    if (v.k === 'glance') {
+      const order = ['mywell', 'nordhof', 'beratung', 'werkbank', 'verwaltung', 'neuland'];
+      const sev = { overdue: 4, due_soon: 3, stagnant: 2, none: 0 };
+      const ids = (this.props.alarmSortGlance ?? true)
+        ? order.slice().sort((a, b) => (sev[B[b].alarm] + (B[b].blocked ? 1 : 0)) - (sev[B[a].alarm] + (B[a].blocked ? 1 : 0)))
+        : order;
+      vals.cards = ids.map(id => {
+        const n = B[id];
+        const big = this.state.sizes[id] != null ? this.state.sizes[id] === 'big' : n.pct != null;
+        let kids;
+        if (n.kids.length) kids = n.kids.map(kid => ({ ...this.signalFields(B[kid]), name: B[kid].name }));
+        else kids = n.tasks.slice(0, 4).map(tid => {
+          const t = T[tid], st = this.taskState(tid);
+          const am = t.alarm !== 'none' ? this.alarmMeta(t.alarm) : null;
+          return {
+            name: t.title, blocked: st.status === 'blocked', hasAlarm: !!am,
+            alarmC: am ? am.c : '', alarmFill: am && t.alarm === 'overdue' ? 'currentColor' : 'none',
+            pct: st.pct, pctLabel: st.pct === 0 && t.last === 'noch nie' ? '—' : st.pct + ' %',
+            color: st.pct === 0 && t.last === 'noch nie' ? 'var(--faint2)' : this.progColor(st.pct)
+          };
+        });
+        return {
+          ...this.signalFields(n), name: n.name, depthHint: n.depth,
+          span: big ? 6 : 3, rows: big ? 2 : 1, big, small: !big,
+          hasSignals: !!n.blocked || (n.alarm && n.alarm !== 'none'),
+          numSize: big ? 40 : 26, isEmpty: n.pct == null,
+          trackBorder: n.pct == null ? '1px dashed var(--dashed)' : 'none',
+          hasKids: big && kids.length > 0, kids,
+          toggle: (e) => { e.stopPropagation(); this.setSize(id, big ? 'small' : 'big'); },
+          toggleHint: big ? 'Als kleine Karte anzeigen' : 'Als große Karte anzeigen',
+          open: (e) => this.setState({ view: { k: 'branch', id }, fA: 'all', fP: null, zoomOrigin: (e.clientX / window.innerWidth * 100).toFixed(1) + '% ' + Math.round(e.clientY) + 'px' })
+        };
+      });
+    }
+
+    if (v.k === 'branch') {
+      const b = B[v.id];
+      vals.crumbs = this.crumbsFor(v.id);
+      vals.branch = { ...this.signalFields(b), name: b.name, depthHint: b.depth };
+      vals.hasSubs = b.kids.length > 0;
+      vals.subs = b.kids.map(kid => ({
+        ...this.signalFields(B[kid]), name: B[kid].name, depthHint: B[kid].depth,
+        open: (e) => this.setState({ view: { k: 'branch', id: kid }, fA: 'all', fP: null, zoomOrigin: (e.clientX / window.innerWidth * 100).toFixed(1) + '% ' + Math.round(e.clientY) + 'px' })
+      }));
+      vals.branchEmpty = b.tasks.length === 0 && b.kids.length === 0;
+      vals.notBranchEmpty = !vals.branchEmpty;
+      const fA = this.state.fA, fP = this.state.fP;
+      const filters = [['all', 'Alle'], ['blocked', 'Blockiert'], ['alarm', 'Alarme']];
+      vals.alarmFilters = filters.map(([key, label]) => ({
+        label, set: () => this.setState({ fA: key }),
+        bg: fA === key ? 'var(--ink)' : 'var(--surface)', c: fA === key ? 'var(--btnfg)' : 'var(--mut)', bd: fA === key ? 'var(--ink)' : 'var(--border)'
+      }));
+      const people = [...new Set(b.tasks.map(t => T[t].resp))];
+      vals.personFilters = people.map(ini => ({
+        initials: ini, name: P[ini].name, bg: P[ini].bg,
+        ring: fP === ini ? 'var(--ink)' : 'transparent', opacity: fP && fP !== ini ? 0.4 : 1,
+        set: () => this.setState({ fP: fP === ini ? null : ini })
+      }));
+      const rows = b.tasks.filter(tid => {
+        const t = T[tid], st = this.taskState(tid);
+        if (fP && t.resp !== fP) return false;
+        if (fA === 'blocked') return st.status === 'blocked';
+        if (fA === 'alarm') return t.alarm !== 'none';
+        return true;
+      });
+      vals.rows = rows.map(tid => {
+        const t = T[tid], st = this.taskState(tid), sm = this.statusMeta(st.status);
+        const am = t.alarm !== 'none' ? this.alarmMeta(t.alarm) : null;
+        return {
+          title: t.title, stLabel: sm.label, stC: sm.c, stBg: sm.bg,
+          blocked: st.status === 'blocked', hasAlarm: !!am,
+          alarmLabel: am ? am.label : '', alarmC: am ? am.c : '', alarmFill: am && t.alarm === 'overdue' ? 'currentColor' : 'none',
+          pct: st.pct, pctLabel: st.pct === 0 && t.last === 'noch nie' ? '—' : st.pct + ' %',
+          color: this.progColor(st.pct), numColor: st.pct === 0 && t.last === 'noch nie' ? 'var(--faint2)' : this.progColor(st.pct),
+          resp: t.resp, respName: P[t.resp].name, respBg: P[t.resp].bg,
+          due: t.due, dueC: t.dueSev === 'overdue' ? 'var(--al-over)' : t.dueSev === 'due_soon' ? 'var(--al-due)' : 'var(--mut3)', dueW: t.dueSev ? 600 : 400,
+          last: t.last === 'noch nie' ? 'noch nie ⟳' : '⟳ ' + t.last,
+          open: () => this.setState({ view: { k: 'task', id: tid } })
+        };
+      });
+      vals.rowsEmpty = rows.length === 0;
+    }
+
+    if (v.k === 'task') {
+      const t = T[v.id], st = this.taskState(v.id);
+      vals.crumbs = this.crumbsFor(t.branch, t.title);
+      const am = t.alarm !== 'none' ? this.alarmMeta(t.alarm) : null;
+      vals.hasDesc = !!t.desc;
+      vals.noDesc = !t.desc;
+      vals.task = {
+        title: t.title, blocked: st.status === 'blocked', hasAlarm: !!am,
+        alarmLabel: am ? am.label : '', alarmC: am ? am.c : '', alarmBg: am ? am.bg : '', alarmBd: am ? am.bd : '', alarmFill: am ? am.fill : 'none',
+        desc: t.desc || '',
+        resp: t.resp, respName: P[t.resp].name, respBg: P[t.resp].bg,
+        dueLong: t.dueLong, dueC: t.dueSev === 'overdue' ? 'var(--al-over)' : t.dueSev === 'due_soon' ? 'var(--al-due)' : 'var(--ink)'
+      };
+      const srcMeta = {
+        manual: { badge: 'Manuell', badgeC: 'var(--mut)', badgeBg: 'var(--chipbg)', bg: 'var(--surface)', bd: 'var(--border)', isAi: false },
+        teams: { badge: 'Teams', badgeC: 'var(--teams)', badgeBg: 'rgba(98,100,167,.12)', bg: 'var(--surface)', bd: 'var(--border)', isAi: false },
+        ai: { badge: 'KI-Zusammenfassung', badgeC: 'var(--plum)', badgeBg: 'rgba(122,94,168,.10)', bg: 'var(--aibg)', bd: 'var(--aibd)', isAi: true }
+      };
+      vals.infos = (t.infos || []).map(i => ({ ...srcMeta[i.src], author: i.author, time: i.time, text: i.text, link: !!i.link }));
+      vals.noInfos = vals.infos.length === 0;
+      const extra = this.state.extraComments[v.id] || [];
+      vals.comments = [...(t.comments || []), ...extra].map(c => ({ initials: c.who, name: P[c.who].name, time: c.time, text: c.text, bg: P[c.who].bg }));
+      vals.noComments = vals.comments.length === 0;
+      vals.draft = this.state.draft;
+      vals.setDraft = (e) => this.setState({ draft: e.target.value });
+      vals.sendComment = () => {
+        const txt = this.state.draft.trim();
+        if (!txt) return;
+        const list = [...(this.state.extraComments[v.id] || []), { who: 'MB', time: 'gerade eben', text: txt }];
+        this.setState({ extraComments: { ...this.state.extraComments, [v.id]: list }, draft: '' });
+      };
+      vals.activity = t.activity || [
+        { text: 'Fortschritt geändert: ' + Math.max(0, st.pct - 20) + ' % → ' + st.pct + ' %', who: P[t.resp].name, time: t.last },
+        { text: 'Aufgabe erstellt', who: 'Matthias B.', time: 'vor 4 Wochen' }
+      ];
+      const statuses = [['open', 'offen'], ['in_progress', 'in Arbeit'], ['blocked', 'blockiert'], ['done', 'erledigt']];
+      vals.statusOpts = statuses.map(([key, label]) => {
+        const sm = this.statusMeta(key), active = st.status === key;
+        return {
+          label, flex: key === 'in_progress' ? '1.2' : '1', ml: key === 'blocked' ? 8 : 0,
+          bg: active ? sm.bg : 'var(--surface)', c: active ? sm.c : 'var(--mut3)', bd: active ? sm.c : 'var(--border)',
+          set: () => {
+            const ov = { ...this.state.ov };
+            if (key === 'done') ov[v.id] = { status: 'done', pct: 100 };
+            else if (st.status === 'done' && key === 'in_progress') ov[v.id] = { status: key, pct: 80 };
+            else ov[v.id] = { ...this.taskState(v.id), status: key };
+            this.setState({ ov });
+          }
+        };
+      });
+      const locked = st.status === 'done';
+      vals.pctLocked = locked;
+      vals.blockedNote = st.status === 'blocked';
+      vals.pctSegs = [20, 40, 60, 80, 100].map(p => {
+        const active = st.pct >= p;
+        const col = this.progColor(st.pct);
+        return {
+          label: p, cursor: locked ? 'default' : 'pointer',
+          bg: active ? col : 'var(--surface)', c: active ? '#fff' : 'var(--mut3)', bd: active ? col : 'var(--border)',
+          set: () => {
+            if (locked) return;
+            const ov = { ...this.state.ov };
+            ov[v.id] = { ...this.taskState(v.id), pct: p, status: p === 100 ? 'done' : (st.status === 'open' ? 'in_progress' : st.status) };
+            this.setState({ ov });
+          }
+        };
+      });
+      const addMin = (min) => this.setState({ added: { ...this.state.added, [v.id]: (this.state.added[v.id] || 0) + min } });
+      vals.timePresets = [[15, '15 m'], [30, '30 m'], [60, '1 h'], [120, '2 h'], [240, '4 h'], [480, '8 h']].map(([min, label]) => ({ label, add: () => addMin(min) }));
+      vals.freeTime = this.state.freeTime;
+      vals.setFreeTime = (e) => this.setState({ freeTime: e.target.value });
+      vals.addFreeTime = () => {
+        const s = this.state.freeTime.trim().toLowerCase();
+        const m = s.match(/^(\d+(?:[.,]\d+)?)\s*(h|m|min|std)?$/);
+        if (!m) return;
+        const num = parseFloat(m[1].replace(',', '.'));
+        const min = (m[2] === 'h' || m[2] === 'std') ? Math.round(num * 60) : Math.round(num);
+        if (min > 0) { addMin(min); this.setState({ freeTime: '' }); }
+      };
+      const added = this.state.added[v.id] || 0;
+      vals.todayLabel = added > 0 ? this.fmtMin(added) : false;
+      vals.timeTotal = t.total || '—';
+      vals.myLogs = t.myLogs || [];
+      vals.noMyLogs = !(t.myLogs && t.myLogs.length);
+    }
+    if (v.k === 'mywork') {
+      const mine = Object.keys(T).filter(id => T[id].resp === 'MB' && this.taskState(id).status !== 'done');
+      const rank = id => { const a = T[id].alarm; return a === 'overdue' ? 0 : a === 'due_soon' ? 1 : a === 'stagnant' ? 2 : 3; };
+      mine.sort((x, y) => rank(x) - rank(y));
+      const pathOf = tid => { const names = []; let b = T[tid].branch; while (b && !B[b].skeleton) { names.unshift(B[b].name); b = B[b].parent; } return names.join(' › '); };
+      const mkRow = tid => {
+        const t = T[tid], st = this.taskState(tid), sm = this.statusMeta(st.status);
+        const am = t.alarm !== 'none' ? this.alarmMeta(t.alarm) : null;
+        return {
+          isRow: true, title: t.title, path: pathOf(tid),
+          stLabel: sm.label, stC: sm.c, stBg: sm.bg,
+          blocked: st.status === 'blocked', hasAlarm: !!am,
+          alarmLabel: am ? am.label : '', alarmC: am ? am.c : '', alarmBg: am ? am.bg : '', alarmBd: am ? am.bd : '',
+          alarmFill: am && t.alarm === 'overdue' ? 'currentColor' : 'none',
+          pct: st.pct, pctLabel: st.pct === 0 && t.last === 'noch nie' ? '—' : st.pct + ' %',
+          color: this.progColor(st.pct), numColor: st.pct === 0 && t.last === 'noch nie' ? 'var(--faint2)' : this.progColor(st.pct),
+          due: t.due, dueC: t.dueSev === 'overdue' ? 'var(--al-over)' : t.dueSev === 'due_soon' ? 'var(--al-due)' : 'var(--mut3)', dueW: t.dueSev ? 600 : 400,
+          last: t.last === 'noch nie' ? 'noch nie ⟳' : '⟳ ' + t.last,
+          open: () => this.setState({ view: { k: 'task', id: tid } })
+        };
+      };
+      const labels = ['Überfällig', 'Bald fällig', 'Stagniert', 'Weitere'];
+      const items = []; let lastRank = -1;
+      mine.forEach(tid => {
+        const r = rank(tid);
+        if (r !== lastRank) { items.push({ isHeader: true, label: labels[r] }); lastRank = r; }
+        items.push(mkRow(tid));
+      });
+      vals.myRows = items;
+      const alarmed = mine.filter(tid => T[tid].alarm !== 'none');
+      vals.hasMyAlarms = alarmed.length > 0;
+      vals.myAlarms = alarmed.map(mkRow);
+    }
+
+    if (v.k === 'login') {
+      const L = this.state.login;
+      this.codeEls = this.codeEls || [];
+      vals.stepEmail = L.step === 'email';
+      vals.stepCode = L.step === 'code';
+      vals.stepDone = L.step === 'done';
+      vals.loginEmail = L.email || 'matthias@forsit.de';
+      vals.setLoginEmail = (e) => this.setState({ login: { ...L, email: e.target.value } });
+      const submit = () => { const em = L.email || 'matthias@forsit.de'; if (em.includes('@')) this.setState({ login: { email: em, step: 'code' }, code: ['', '', '', '', '', ''] }, () => { this.codeEls[0] && this.codeEls[0].focus(); }); };
+      vals.submitEmail = submit;
+      vals.emailKey = (e) => { if (e.key === 'Enter') submit(); };
+      vals.msLogin = () => this.setState({ login: { email: L.email || 'matthias@forsit.de', step: 'done' } });
+      vals.resend = () => { this.setState({ code: ['', '', '', '', '', ''] }); this.codeEls[0] && this.codeEls[0].focus(); };
+      vals.codeBoxes = this.state.code.map((val, i) => ({
+        val,
+        setRef: (el) => { this.codeEls[i] = el; },
+        onChange: (e) => {
+          const d = (e.target.value.match(/\d/g) || []).pop() || '';
+          const code = [...this.state.code]; code[i] = d;
+          this.setState({ code });
+          if (d && i < 5) { this.codeEls[i + 1] && this.codeEls[i + 1].focus(); }
+          if (code.every(c => c)) setTimeout(() => this.setState({ login: { ...this.state.login, step: 'done' } }), 300);
+        },
+        onKey: (e) => { if (e.key === 'Backspace' && !this.state.code[i] && i > 0) { this.codeEls[i - 1] && this.codeEls[i - 1].focus(); } }
+      }));
+      vals.openApp = () => this.setState({ view: { k: 'glance' }, login: { step: 'email', email: '' }, code: ['', '', '', '', '', ''] });
+    }
+
+    return vals;
+  }
+}
+</script>
+</body>
+</html>
