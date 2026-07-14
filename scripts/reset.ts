@@ -21,9 +21,10 @@ try {
   await client.query("CREATE SCHEMA public");
   const ran = await migrate(client);
   process.stdout.write(`applied: ${ran.join(", ")}\n`);
-  // Dev/staging convenience: give the app role a known password (created
-  // in migration 0015; production sets its own, see docs/OPS.md).
+  // Dev/staging convenience: give the app and auth roles known passwords
+  // (created in migrations 0015/0019; production sets its own, docs/OPS.md).
   await client.query("ALTER ROLE app_user WITH LOGIN PASSWORD 'treeops'");
+  await client.query("ALTER ROLE auth_user WITH LOGIN PASSWORD 'treeops'");
   const seed = await readFile(
     join(import.meta.dirname, "..", "db", "seed", "seed.sql"),
     "utf8",
