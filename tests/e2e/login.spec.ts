@@ -19,7 +19,7 @@ test("OTP happy path: mail → code boxes → success → picker → tenant", as
   await expect(page.getByText("Choose a workspace")).toBeVisible();
   await page.getByRole("link", { name: "Forsit", exact: true }).click();
   await expect(page.getByTestId("tenant-name")).toHaveText("Forsit");
-  await expect(page.getByTestId("branch-row").filter({ hasText: "myWell" })).toBeVisible();
+  await expect(page.getByTestId("glance-card").filter({ hasText: "myWell" })).toBeVisible();
 });
 
 test("wrong code five times kills the code — the correct one no longer works", async ({

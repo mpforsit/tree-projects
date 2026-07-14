@@ -11,7 +11,9 @@ export default defineConfig({
   fullyParallel: false,
   workers: 1,
   retries: 0,
-  timeout: 30_000,
+  timeout: 45_000,
+  // The dev webServer compiles routes on first hit — allow for it.
+  expect: { timeout: 15_000 },
   globalSetup: "./tests/e2e/global-setup.ts",
   use: {
     baseURL: "http://localhost:3111",
