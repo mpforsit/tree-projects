@@ -34,3 +34,6 @@ done). One line each: what, why, date.
 - `user_preference` (glance card sizes) is UI state outside the event-sourced domain: app_user writes it directly under an own-row RLS policy, no events, no SECURITY DEFINER ceremony. — 2026-07-14
 - Glance roots: the member's full-visible branches without a full-visible parent; a single root shows its CHILDREN as cards (matches the prototype where the tenant root is skeleton context, not a card). — 2026-07-14
 - Task rows render the blocked icon from live status; branch cards use the 30-min cached blocked_below/alarm state (M5 decision carried into the views). — 2026-07-14
+- `search_visible` is SECURITY INVOKER by design: it runs as app_user, so tenant scoping and §5 visibility come from visible_nodes + RLS structurally; skeleton ancestors and archived nodes are excluded in the function. — 2026-07-15
+- `ts_headline` uses `[[`/`]]` markers rendered through React — never raw HTML from user content into the DOM (XSS). — 2026-07-15
+- The e2e suite signs each seed user in once (storage states) so it stays inside the ≤5 OTP requests/h/email throttle; only login.spec exercises the OTP flow itself. — 2026-07-15

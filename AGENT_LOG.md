@@ -302,3 +302,41 @@ Read this at the start of each session.
 - Playwright expect timeout raised to 15 s (dev-server first-compile).
 - Next: M7 — My Work (Meine Alarme + grouped cross-tree list) and
   Postgres FTS search over visible_nodes with keyboard flow.
+
+## 2026-07-15 — M7 complete (My Work + Search)
+
+**What was done**
+
+- 0023: German-config GIN indexes on node/info_piece/comment and
+  `search_visible(p_query)` — SECURITY INVOKER so it runs as app_user:
+  node hits through visible_nodes, info/comment hits through RLS; tenant
+  scoping and §5 visibility are structural. Skeleton ancestors and
+  archived nodes excluded (§15.1); websearch_to_tsquery; ts_headline
+  with [[/]] markers (React-rendered, no raw HTML → no XSS).
+- My Work (`/[tenant]/my`): "Meine Alarme" module (badge pill + title +
+  branch path + due) and the cross-tree list of the viewer's open
+  responsibilities grouped Überfällig → Bald fällig → Stagniert →
+  Weitere, rows with branch-path second lines, due-date sort in groups.
+- Search UI: topbar SearchBox (`/` focuses from anywhere, Enter runs),
+  results screen from tokens grouped Bereiche/Aufgaben/Informationen/
+  Kommentare with path second lines and highlighted snippets; keyboard
+  flow ↑/↓ + Enter + Esc-up in a client wrapper.
+- tests/sql/m7_search.sql (as app_user, 6 checks): umlaut/compound
+  ("Prüfung" findet "Barrierefreiheits-Prüfung"), content-type coverage,
+  restricted-member scoping, skeleton exclusion, cross-tenant denial in
+  both directions, empty-without-context. test:sql now runs three files
+  (34 PASS lines total).
+- e2e reworked onto Playwright storage states: auth.setup.ts signs each
+  seed user in once (stays inside the ≤5 OTP requests/h/email throttle
+  that started biting as the suite grew); specs use test.use({
+  storageState }). New my-search.spec: My-Work grouping, umlaut search
+  via keyboard round-trip, restricted-member no-results, Esc-up. 22 e2e
+  green; 97 unit tests; build clean.
+
+**Caveats / follow-ups**
+
+- ts_rank without setweight (title vs. body weighting) — fine for v1
+  volume; revisit in M9 perf pass if ordering feels off.
+- Next: M8 — tenant admin screen (members & flags, invite with mail,
+  alarm defaults, tenant settings, move tool), /instance (tenants +
+  domain claims), archive/unarchive UI with "Archiviert anzeigen".
