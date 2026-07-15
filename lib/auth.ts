@@ -15,6 +15,8 @@
 import { betterAuth } from "better-auth";
 import { emailOTP, genericOAuth } from "better-auth/plugins";
 import pg from "pg";
+import { entraClaimsFromIdToken } from "./entra.ts";
+import { log } from "./log.ts";
 import { sendMail } from "./mail.ts";
 import { strings } from "./strings.ts";
 
@@ -156,6 +158,33 @@ function buildAuth() {
                 scopes: ["openid", "profile", "email"],
                 pkce: true,
                 disableSignUp: true, // invitation-only, also via SSO
+                // §8.2 enforcement: the tid must be allowlisted by at
+                // least one tenant; the linked account stores tid/oid so
+                // the Teams identity mapping (phase 2) stays exact.
+                getUserInfo: async (tokens) => {
+                  const idToken = tokens.idToken;
+                  const claims = idToken ? entraClaimsFromIdToken(idToken) : null;
+                  if (!claims || !claims.email) {
+                    log.info("entra sign-in rejected: unusable id_token");
+                    return null;
+                  }
+                  const { rows } = await getAuthPool().query<{ allowed: boolean }>(
+                    "SELECT auth_entra_tid_allowed($1) AS allowed",
+                    [claims.tid],
+                  );
+                  if (!rows[0]?.allowed) {
+                    log.info("entra sign-in rejected: tid not allowlisted", {
+                      tid: claims.tid,
+                    });
+                    return null;
+                  }
+                  return {
+                    id: `${claims.tid}/${claims.oid}`,
+                    email: claims.email,
+                    name: claims.name ?? claims.email,
+                    emailVerified: true,
+                  };
+                },
               },
             ],
           }),
