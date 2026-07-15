@@ -136,6 +136,31 @@ export const strings = {
     moved: "Verschoben",
     fallback: "Änderung",
   },
+  myWork: {
+    title: "Meine Arbeit",
+    myAlarms: "Meine Alarme",
+    noAlarms: "Keine Alarme — alles im grünen Bereich.",
+    groups: {
+      overdue: "Überfällig",
+      due_soon: "Bald fällig",
+      stagnant: "Stagniert",
+      rest: "Weitere",
+    } as Record<string, string>,
+    empty: "Dir ist derzeit keine Aufgabe zugewiesen.",
+  },
+  search: {
+    title: "Suche",
+    placeholder: "Suchen ( / )",
+    resultsFor: (q: string) => `Ergebnisse für „${q}"`,
+    noResults: "Keine Treffer.",
+    groups: {
+      branch: "Bereiche",
+      task: "Aufgaben",
+      info: "Informationen",
+      comment: "Kommentare",
+    } as Record<string, string>,
+    hint: "↑/↓ wählen · Enter öffnen · Esc zurück",
+  },
   errors: {
     notFound: "Nicht gefunden.",
   },

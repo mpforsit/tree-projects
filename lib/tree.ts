@@ -42,6 +42,16 @@ export function isDescendant(node: VisibleNode, ancestor: VisibleNode): boolean 
   return node.path === ancestor.path || node.path.startsWith(`${ancestor.path}.`);
 }
 
+/** Ancestor titles joined "myWell › App Relaunch 2.0" (second lines in
+ *  My Work and search results, handover §4). */
+export function branchPathLabel(all: VisibleNode[], path: string): string {
+  return all
+    .filter((n) => path.startsWith(`${n.path}.`))
+    .sort((a, b) => a.path.length - b.path.length)
+    .map((n) => n.title)
+    .join(" › ");
+}
+
 export function subtreeTaskCount(all: VisibleNode[], branch: VisibleNode): number {
   return all.filter(
     (n) => n.type === "task" && !n.archived_at && isDescendant(n, branch),

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { AvatarMenu } from "@/components/avatar-menu";
+import { SearchBox } from "@/components/search-box";
 import { getSessionUser } from "@/lib/auth";
 import { strings } from "@/lib/strings";
 import { userTenants } from "@/lib/tenants";
@@ -55,21 +56,7 @@ export default async function TenantLayout({
           >
             {strings.shell.myWork}
           </Link>
-          <input
-            type="search"
-            placeholder={strings.shell.searchHint}
-            aria-label={strings.shell.searchHint}
-            readOnly
-            style={{
-              width: 160,
-              padding: "6px 10px",
-              borderRadius: 8,
-              border: "1px solid var(--border)",
-              background: "var(--surface)",
-              color: "var(--mut2)",
-              fontSize: 12.5,
-            }}
-          />
+          <SearchBox slug={active.slug} />
           <AvatarMenu
             displayName={user.name}
             activeSlug={active.slug}
