@@ -29,6 +29,8 @@ export interface TaskRow {
   responsibleName: string;
   dueShort: string | null;
   ago: string | null;
+  /** Rendered with an "archiviert" chip when the show-archived toggle is on. */
+  archived?: boolean;
 }
 
 export function TaskList({ slug, tasks }: { slug: string; tasks: TaskRow[] }) {
@@ -105,6 +107,20 @@ export function TaskList({ slug, tasks }: { slug: string; tasks: TaskRow[] }) {
           >
             <StatusChip status={t.status} />
             <span className="task-title">{t.title}</span>
+            {t.archived && (
+              <span
+                style={{
+                  fontSize: 11,
+                  color: "var(--faint)",
+                  border: "1px dashed var(--dashed)",
+                  borderRadius: 999,
+                  padding: "1px 7px",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {strings.archive.chip}
+              </span>
+            )}
             {t.status === "blocked" && <BlockedIcon size={12} />}
             <AlarmGlyph state={t.alarm} size={12} />
             <ProgressBar percent={t.percent} width={44} />

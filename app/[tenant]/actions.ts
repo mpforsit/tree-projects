@@ -13,14 +13,16 @@ import { withTenantContext, type TenantContext } from "@/lib/db";
 import {
   addComment,
   addTimeLog,
+  archiveNode,
   createNode,
   setTaskPercent,
   setTaskStatus,
+  unarchiveNode,
   type TaskStatus,
 } from "@/lib/events";
 import { userTenants } from "@/lib/tenants";
 
-async function resolveContext(slug: string): Promise<TenantContext> {
+export async function resolveContext(slug: string): Promise<TenantContext> {
   const user = await getSessionUser(await headers());
   if (!user) throw new Error("not signed in");
   const tenant = (await userTenants(user.id)).find((t) => t.slug === slug);
@@ -103,6 +105,25 @@ export async function addCommentAction(
     return { error: err instanceof Error ? err.message : "Fehler" };
   }
   revalidatePath(`/${slug}/t/${taskId}`);
+  return {};
+}
+
+/** Archive/unarchive (§7: branch_admin of the subtree or tenant admin —
+ *  enforced inside the SQL function). */
+export async function setArchivedAction(
+  slug: string,
+  nodeId: string,
+  archived: boolean,
+): Promise<{ error?: string }> {
+  const ctx = await resolveContext(slug);
+  try {
+    await withTenantContext(ctx, (client) =>
+      archived ? archiveNode(client, nodeId) : unarchiveNode(client, nodeId),
+    );
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "Fehler" };
+  }
+  revalidatePath(`/${slug}`, "layout");
   return {};
 }
 
