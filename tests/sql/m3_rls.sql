@@ -307,5 +307,22 @@ BEGIN
   RAISE NOTICE 'PASS: rollup exact numbers (weighted, fallback, archive, "—")';
 END $$;
 
+-- 15. (M8) Tenant METADATA reads: the instance admin lists all tenants
+--     for /instance, ordinary users only their own — while tenant TREE
+--     data stays invisible to the instance admin (check 9).
+DO $$
+BEGIN
+  PERFORM set_config('app.user_id', 'e0000000-0000-4000-8000-000000000006', true);
+  PERFORM set_config('app.tenant_id', '', true);
+  IF (SELECT count(*) FROM tenant) < 2 THEN
+    RAISE EXCEPTION 'FAIL: instance admin should list all tenants';
+  END IF;
+  PERFORM set_config('app.user_id', 'e0000000-0000-4000-8000-000000000002', true);
+  IF (SELECT count(*) FROM tenant) <> 1 THEN
+    RAISE EXCEPTION 'FAIL: IK should see exactly their 1 tenant';
+  END IF;
+  RAISE NOTICE 'PASS: tenant metadata reads (instance admin all, members own)';
+END $$;
+
 ROLLBACK;
 \echo M3 RLS verification complete — all checks passed.

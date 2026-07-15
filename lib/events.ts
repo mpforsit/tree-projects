@@ -306,6 +306,13 @@ export async function setTenantSettings(
   ]);
 }
 
+export async function setEntraAllowlist(
+  client: pg.PoolClient,
+  allowlist: string[],
+): Promise<void> {
+  await client.query("SELECT set_entra_allowlist($1)", [allowlist]);
+}
+
 export async function createTenant(
   client: pg.PoolClient,
   slug: string,
