@@ -397,3 +397,52 @@ M8 was built on top of it per the owner's decision.
   perf tenant, security pass incl. §7 RPC matrix + OTP burst, ops
   rehearsal, accessibility baseline, DECISIONS review, tag
   v1.0.0-phase1).
+
+## 2026-07-15 — M9 complete (hardening & release readiness)
+
+**What was done**
+
+- Security pass: tests/sql/m9_security.sql (runs as app_user) — 25-case
+  §7 forbidden-action matrix as the least-privileged failing role each,
+  full cross-tenant matrix (9 relations read-clean, 19 mutation families
+  denied against tenant-A ids from tenant-B context), direct-DML sweep
+  over all domain tables. e2e security.spec: parallel OTP burst (12
+  requests → ≤5 granted, uniform responses), slug/URL bypass matrix
+  (7 variants + smuggled foreign ids under a valid slug → 404), no-cookie
+  redirect. Finding fixed: the per-email throttle was racy under
+  parallelism → 0025 (advisory-locked atomic count-and-log, wrapper
+  route now calls it).
+- Branch stagnation override UI (plan §7/§6 follow-up): AlarmConfig on
+  the branch header for branch_admins/tenant admins →
+  configure_branch_alarms; e2e covers set/clear/hidden-for-members.
+- Dark-mode matrix, ~95-char string audit (seeded BFSG title: row
+  ellipsis, task-view wrap, badge nowrap, card 2-line clamp), a11y
+  baseline (all controls named on 4 screens, signals carry
+  role=img+labels — never color-only), ramp-contrast unit test with two
+  documented exceptions (DECISIONS).
+- Performance (docs/PERF.md): generated 500-node/4.7k-event tenant +
+  second 500-node tenant (scripts/perf.ts, rebuilds idempotently,
+  optional HTTP phase against a production build). Findings fixed:
+  0026 (per-statement InitPlans in visible_nodes/task_time_totals;
+  statement-level time_log rollup with transition tables) and 0027
+  (policies use a per-statement app_visible_node_ids() array). Results:
+  reads 438→9 ms, search 105→10 ms, bulk import 119→0,12 ms/row, HTTP
+  glance 38 ms / branch 106 ms / my-work 225 ms (sandbox; staging
+  re-check on the ops list).
+- Entra allowlist enforcement (0028 + lib/entra.ts): getUserInfo decodes
+  tid/oid, checks the union of tenant allowlists, stores `tid/oid` as
+  account id; unit-covered. Mocked-IdP browser e2e deferred (DECISIONS);
+  staging SSO rehearsal added to OPS.md.
+
+**Verify:** 111 unit / 4 SQL suites (m1, m3, m7, m9) / 51+17+15 e2e — all
+green after each migration; build clean.
+
+**Caveats / follow-ups**
+
+- Operator items before the release tag is DEPLOYED: Coolify staging
+  setup, backup restore rehearsal (RTO), staging perf re-check, Entra
+  staging SSO rehearsal (all in docs/OPS.md).
+- My-work HTTP at 225 ms on sandbox hardware — bundle its three reads if
+  staging misses the 200 ms target.
+- Phase-2 seams stay dormant as planned (estimate field, exported_at,
+  Teams capture, digest).

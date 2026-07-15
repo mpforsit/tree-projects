@@ -68,3 +68,16 @@ Record here after each rehearsal:
 - Push-to-deploy works on staging.
 - A throwaway table survives backup + restore into a scratch database.
 - The scheduled task logs a heartbeat.
+
+## Release checklist additions (M9)
+
+- ☐ **Entra go-live:** after setting the `ENTRA_*` secrets, perform ONE
+  real "Sign in with Microsoft" on staging (allowlisted tid + a
+  non-allowlisted account, which must be rejected) before enabling the
+  button in production — the OIDC flow is not covered by CI e2e.
+- ☐ **Performance re-check on staging hardware:** run
+  `scripts/perf.ts` against the staging build (see docs/PERF.md);
+  target < 200 ms for glance/branch/my-work.
+- ☐ Ops rehearsal (plan M9): restore staging from last night's backup
+  into a scratch database, record duration (RTO) in the table above;
+  verify the production project has no seed, secrets set, backups green.
