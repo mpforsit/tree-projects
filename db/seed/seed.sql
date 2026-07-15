@@ -174,8 +174,11 @@ INSERT INTO membership (tenant_id, member_id, node_id, role) VALUES
 -- ---------------------------------------------------------------- time logs
 -- t1 totals 14 h 45 m (prototype). Weighted-rollup inputs for M3 tests.
 
+-- Stable id: referenced by the M9 cross-tenant security matrix.
+INSERT INTO time_log (id, tenant_id, task_id, member_id, date, minutes, note) VALUES
+  ('dd000000-0000-4000-8000-000000000001', '11111111-1111-4111-8111-111111111111', 'a2000000-0000-4000-8000-000000000001', 'ae000000-0000-4000-8000-000000000002', current_date - 1,  120, 'Webhook-Debugging');
+
 INSERT INTO time_log (tenant_id, task_id, member_id, date, minutes, note) VALUES
-  ('11111111-1111-4111-8111-111111111111', 'a2000000-0000-4000-8000-000000000001', 'ae000000-0000-4000-8000-000000000002', current_date - 1,  120, 'Webhook-Debugging'),
   ('11111111-1111-4111-8111-111111111111', 'a2000000-0000-4000-8000-000000000001', 'ae000000-0000-4000-8000-000000000002', current_date - 4,  240, 'Checkout-Flow umgebaut'),
   ('11111111-1111-4111-8111-111111111111', 'a2000000-0000-4000-8000-000000000001', 'ae000000-0000-4000-8000-000000000001', current_date - 6,  240, 'Vertragsabstimmung Mollie'),
   ('11111111-1111-4111-8111-111111111111', 'a2000000-0000-4000-8000-000000000001', 'ae000000-0000-4000-8000-000000000002', current_date - 9,  285, 'Sandbox-Anbindung'),
