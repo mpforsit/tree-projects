@@ -60,8 +60,12 @@ test.describe("as IK", () => {
     await page.goto("/forsit");
     await page.goto("/forsit/search?q=DATEV");
     await expect(page.getByTestId("search-result").first()).toBeVisible();
-    await page.keyboard.press("Escape");
-    await expect(page).not.toHaveURL(/\/search/);
+    // Retry — the results are server-rendered and visible before
+    // hydration attaches the keydown listener.
+    await expect(async () => {
+      await page.keyboard.press("Escape");
+      await expect(page).not.toHaveURL(/\/search/, { timeout: 1_000 });
+    }).toPass();
   });
 });
 
