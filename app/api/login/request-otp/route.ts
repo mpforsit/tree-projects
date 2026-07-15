@@ -27,23 +27,16 @@ export async function POST(request: Request): Promise<NextResponse> {
     return NextResponse.json({ sso: true });
   }
 
-  const { rows: recent } = await pool.query<{ n: number }>(
-    `SELECT count(*)::int AS n FROM event
-     WHERE type = 'auth.otp_requested'
-       AND payload->>'email' = $1
-       AND created_at > now() - interval '1 hour'`,
+  // Atomic count+log (advisory-locked, migration 0025) — a parallel burst
+  // must not slip past the ≤5/h limit.
+  const { rows: throttle } = await pool.query<{ allowed: boolean }>(
+    "SELECT auth_otp_throttle($1) AS allowed",
     [email],
   );
-  if (recent[0]!.n >= 5) {
+  if (!throttle[0]!.allowed) {
     // Uniform response: the sender stays silent, no code goes out.
     return NextResponse.json({ ok: true });
   }
-
-  await pool.query(
-    `INSERT INTO event (tenant_id, node_id, actor_member_id, source, type, payload)
-     VALUES (NULL, NULL, NULL, 'ui', 'auth.otp_requested', $1)`,
-    [JSON.stringify({ email })],
-  );
 
   try {
     await getAuth().api.sendVerificationOTP({ body: { email, type: "sign-in" } });
