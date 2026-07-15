@@ -37,3 +37,7 @@ done). One line each: what, why, date.
 - `search_visible` is SECURITY INVOKER by design: it runs as app_user, so tenant scoping and §5 visibility come from visible_nodes + RLS structurally; skeleton ancestors and archived nodes are excluded in the function. — 2026-07-15
 - `ts_headline` uses `[[`/`]]` markers rendered through React — never raw HTML from user content into the DOM (XSS). — 2026-07-15
 - The e2e suite signs each seed user in once (storage states) so it stays inside the ≤5 OTP requests/h/email throttle; only login.spec exercises the OTP flow itself. — 2026-07-15
+- (M8) The tenant-table RLS also admits the instance admin (0024) so /instance can list tenant METADATA; `userTenants` is therefore strictly membership-scoped (`app_user_tenant_ids`) — instance-admin metadata reads must never become picker entries or tenant-shell access (invariant 6, e2e-covered). — 2026-07-15
+- (M8) `set_entra_allowlist` validates entries as GUIDs (Entra directory ids) and logs old→new as `tenant.settings_changed`; OIDC-side enforcement of the allowlist remains with the M9 security pass. — 2026-07-15
+- (M8) `/[tenant]/admin` and `/instance` 404 for the unauthorized (capability is structural, §15.2 "hidden"); the admin link renders only for tenant admins. — 2026-07-15
+- (M8) The show-archived toggle is the URL param `?archiviert=1` — view-local like all filters (handover §6). Branch-admin detection for the archive affordance is computed app-side over membership × visible_nodes (the SQL helper joins `node`, which app_user cannot read). — 2026-07-15

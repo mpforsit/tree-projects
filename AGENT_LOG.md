@@ -340,3 +340,60 @@ Read this at the start of each session.
 - Next: M8 — tenant admin screen (members & flags, invite with mail,
   alarm defaults, tenant settings, move tool), /instance (tenants +
   domain claims), archive/unarchive UI with "Archiviert anzeigen".
+
+## 2026-07-15 — M8 complete (tenant admin + instance admin + archiving)
+
+**Session note:** two sessions had worked the branch in parallel — this
+session's duplicate M4 was discarded in favor of the pushed M4–M7 (backup
+branch `m4-parallel-backup`), the adopted state was re-verified here, and
+M8 was built on top of it per the owner's decision.
+
+**What was done**
+
+- 0024: `tenant.entra_tenant_allowlist` (§8.2) + `set_entra_allowlist`
+  (tenant admin, GUID-validated, old→new logged) + `app_is_instance_admin`
+  and a widened tenant-table policy so /instance can list tenant METADATA.
+  Compensating fix: `userTenants` is now strictly membership-scoped —
+  instance-admin metadata reads never become picker/shell access
+  (invariant 6; DECISIONS).
+- `/[tenant]/admin` (§15.1, German, ~720 px stacked cards): members &
+  flags table (toggles → set_member_flag, last-admin guard already in
+  M2), invite form (invite_member + invitation mail via lib/mail),
+  Entra allowlist editor, alarm defaults + tenant settings
+  (set_tenant_settings), move tool with rollup-recompute confirmation
+  (move_node). Admin link in the avatar menu for tenant admins only;
+  non-admins 404.
+- `/instance` (English, is_instance_admin only, 404 otherwise): tenant
+  list/create (create_tenant), appoint tenant admin
+  (appoint_tenant_admin), domain claims with SSO enforcement toggles
+  (claim/release/set_domain_sso).
+- Archiving on the branch view: archive/unarchive button for
+  branch_admins of the subtree / tenant admins (branch-admin paths
+  computed app-side), "Archiviert anzeigen" toggle (`?archiviert=1`,
+  view-local), archived chips on header/cards/task rows.
+
+**Verify (all green)**
+
+- Vitest 101 (new admin.test.ts): move_node recomputes BOTH chains with
+  exact numbers (source → NULL "—", target → 70); archived task drops the
+  parent from 100 to 80 and returns; allowlist admin-only/validated/
+  logged. m3_rls.sql check 15: instance admin lists all tenants, members
+  only their own. e2e admin.spec (6 tests): flag flip effective for JT
+  without re-login (both directions), move tool round-trip via UI,
+  archive → 63 %→62 %→63 % with toggle reveal, tenant admin cannot reach
+  /instance, non-admin 404 + no admin link, instance admin manages
+  tenants/claims but 404s on /forsit (invariant 6). Full suite 28 e2e ×3
+  consecutive green runs; two hydration/commit races fixed in tests
+  (admin flag reload-poll, my-search Esc retry).
+
+**Caveats / follow-ups**
+
+- Allowlist OIDC enforcement + mocked-OIDC e2e → M9 security pass.
+- Branch-level stagnation override UI (configure_branch_alarms exists
+  since M5) has no surface yet — plan puts alarm defaults in admin;
+  per-branch override belongs on the branch view (§7 branch_admin) —
+  small follow-up.
+- Next: M9 — hardening (dark-mode matrix, string-length audit, 500-node
+  perf tenant, security pass incl. §7 RPC matrix + OTP burst, ops
+  rehearsal, accessibility baseline, DECISIONS review, tag
+  v1.0.0-phase1).
