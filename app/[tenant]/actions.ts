@@ -14,6 +14,7 @@ import {
   addComment,
   addTimeLog,
   archiveNode,
+  configureBranchAlarms,
   createNode,
   setTaskPercent,
   setTaskStatus,
@@ -124,6 +125,25 @@ export async function setArchivedAction(
     return { error: err instanceof Error ? err.message : "Fehler" };
   }
   revalidatePath(`/${slug}`, "layout");
+  return {};
+}
+
+/** §6: per-branch stagnation override (branch_admin/tenant admin — §7,
+ *  enforced in the SQL function). null → tenant default. */
+export async function configureBranchAlarmsAction(
+  slug: string,
+  nodeId: string,
+  days: number | null,
+): Promise<{ error?: string }> {
+  const ctx = await resolveContext(slug);
+  try {
+    await withTenantContext(ctx, (client) =>
+      configureBranchAlarms(client, nodeId, days),
+    );
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "Fehler" };
+  }
+  revalidatePath(`/${slug}/b/${nodeId}`);
   return {};
 }
 

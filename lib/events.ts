@@ -306,6 +306,16 @@ export async function setTenantSettings(
   ]);
 }
 
+/** §6/§7: per-branch stagnation override, branch_admin or tenant admin;
+ *  null returns the branch to the tenant default. */
+export async function configureBranchAlarms(
+  client: pg.PoolClient,
+  nodeId: string,
+  days: number | null,
+): Promise<void> {
+  await client.query("SELECT configure_branch_alarms($1, $2)", [nodeId, days]);
+}
+
 export async function setEntraAllowlist(
   client: pg.PoolClient,
   allowlist: string[],

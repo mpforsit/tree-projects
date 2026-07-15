@@ -114,6 +114,31 @@ test.describe("as MB (tenant admin)", () => {
   });
 });
 
+test.describe("as JT (branch_admin of nordhof only)", () => {
+  test.use({ storageState: authState("jt") });
+
+  test("configures the branch stagnation override; hidden where not branch_admin", async ({
+    page,
+  }) => {
+    await page.goto(`/forsit/b/${B.nordhof}`);
+    await page.getByTestId("alarm-config-toggle").click();
+    await page.getByLabel("Stagnations-Alarm").fill("3");
+    await page.getByRole("button", { name: "OK", exact: true }).click();
+    await expect(page.getByTestId("alarm-config-toggle")).toHaveText(
+      "Stagnations-Alarm: 3 Tage",
+    );
+    // Restore the tenant default.
+    await page.getByTestId("alarm-config-toggle").click();
+    await page.getByRole("button", { name: "Standard verwenden" }).click();
+    await expect(page.getByTestId("alarm-config-toggle")).toHaveText(
+      "Stagnations-Alarm: Standard",
+    );
+    // Plain member elsewhere: control hidden (§15.2).
+    await page.goto("/forsit/b/a1000000-0000-4000-8000-000000000005"); // werkbank
+    await expect(page.getByTestId("alarm-config-toggle")).not.toBeVisible();
+  });
+});
+
 test.describe("as IK (not a tenant admin)", () => {
   test.use({ storageState: authState("ik") });
 

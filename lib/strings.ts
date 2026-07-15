@@ -192,6 +192,14 @@ export const strings = {
     moveDo: "Verschieben",
     moved: "Verschoben — Fortschritte neu berechnet.",
   },
+  branchAlarms: {
+    label: "Stagnations-Alarm",
+    days: (n: number) => `${n} Tage`,
+    tenantDefault: (n: number) => `Standard (${n} Tage)`,
+    inherited: "Standard",
+    save: "OK",
+    clear: "Standard verwenden",
+  },
   archive: {
     archive: "Archivieren",
     unarchive: "Archivierung aufheben",

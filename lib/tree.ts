@@ -21,6 +21,7 @@ export interface VisibleNode {
   blocked_below_cached: boolean | null;
   sort_order: number | null;
   archived_at: string | null;
+  stagnation_days_override: number | null;
 }
 
 export async function fetchVisibleNodes(client: pg.PoolClient): Promise<VisibleNode[]> {
@@ -31,7 +32,7 @@ export async function fetchVisibleNodes(client: pg.PoolClient): Promise<VisibleN
             progress_cached::float AS progress_cached,
             alarm_state_cached::text AS alarm_state_cached,
             blocked_below_cached, sort_order::float AS sort_order,
-            archived_at::text AS archived_at
+            archived_at::text AS archived_at, stagnation_days_override
      FROM visible_nodes
      ORDER BY path`,
   );

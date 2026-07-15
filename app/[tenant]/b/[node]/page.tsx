@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
+import { AlarmConfig } from "@/components/alarm-config";
 import { ArchiveButton } from "@/components/archive-button";
 import { Breadcrumb } from "@/components/breadcrumb";
 import { NewNodeButton } from "@/components/new-node";
@@ -51,6 +52,11 @@ export default async function BranchPage({
       viewer: await fetchViewer(client),
       lastProgress: await fetchLastProgress(client),
       branchAdminPaths: await fetchBranchAdminPaths(client),
+      stagnationDefault: (
+        await client.query<{ d: number }>(
+          "SELECT default_stagnation_days AS d FROM tenant WHERE id = app_tenant_or_null()",
+        )
+      ).rows[0]!.d,
     }),
   );
 
@@ -144,11 +150,19 @@ export default async function BranchPage({
             </Link>
           )}
           {canArchive && (
-            <ArchiveButton
-              slug={slug}
-              nodeId={branch.id}
-              archived={Boolean(branch.archived_at)}
-            />
+            <>
+              <AlarmConfig
+                slug={slug}
+                nodeId={branch.id}
+                override={branch.stagnation_days_override}
+                tenantDefault={data.stagnationDefault}
+              />
+              <ArchiveButton
+                slug={slug}
+                nodeId={branch.id}
+                archived={Boolean(branch.archived_at)}
+              />
+            </>
           )}
         </div>
         <div style={{ fontSize: 12.5, color: "var(--mut2)", marginTop: 3 }}>
