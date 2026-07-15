@@ -82,6 +82,23 @@ export async function fetchViewer(client: pg.PoolClient): Promise<ViewerMember |
   return rows[0] ?? null;
 }
 
+/** Paths of branches where the viewer is branch_admin (archive rights,
+ *  §7). Computed app-side: the SQL helper joins the node table, which
+ *  app_user cannot read directly. */
+export async function fetchBranchAdminPaths(client: pg.PoolClient): Promise<string[]> {
+  const { rows } = await client.query<{ path: string }>(
+    `SELECT vn.path::text AS path
+     FROM membership ms
+     JOIN visible_nodes vn ON vn.id = ms.node_id
+     WHERE ms.member_id = app_actor_id() AND ms.role = 'branch_admin'`,
+  );
+  return rows.map((r) => r.path);
+}
+
+export function isUnderAnyPath(nodePath: string, roots: string[]): boolean {
+  return roots.some((p) => nodePath === p || nodePath.startsWith(`${p}.`));
+}
+
 /** last_progress_at per visible task (RLS-scoped via security_invoker). */
 export async function fetchLastProgress(
   client: pg.PoolClient,
