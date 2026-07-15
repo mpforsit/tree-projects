@@ -10,6 +10,11 @@ export function ownerClient(): pg.Client {
 
 export const TENANT_A = "11111111-1111-4111-8111-111111111111";
 
+/** Storage-state file for a seed user (written by auth.setup.ts). */
+export function authState(shortName: "mb" | "ik" | "ms" | "ad" | "jt"): string {
+  return `.test-auth/${shortName}.json`;
+}
+
 /** Full OTP login: email step → mail → 6-box entry → success step. */
 export async function loginViaOtp(page: Page, email: string): Promise<void> {
   const before = Date.now();

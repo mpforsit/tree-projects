@@ -14,6 +14,12 @@ export default defineConfig({
   timeout: 45_000,
   // The dev webServer compiles routes on first hit — allow for it.
   expect: { timeout: 15_000 },
+  projects: [
+    // One OTP login per seed user, stored as reusable state — keeps the
+    // suite inside the ≤5 requests/h/email throttle (spec §8.1).
+    { name: "setup", testMatch: /auth\.setup\.ts/ },
+    { name: "chromium", dependencies: ["setup"], testIgnore: /auth\.setup\.ts/ },
+  ],
   globalSetup: "./tests/e2e/global-setup.ts",
   use: {
     baseURL: "http://localhost:3111",

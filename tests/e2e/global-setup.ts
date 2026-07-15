@@ -16,4 +16,5 @@ export default async function setup(): Promise<void> {
     { stdio: "inherit", env: { ...process.env, APP_ENV: "test" } },
   );
   await rm(join(process.cwd(), ".test-mail"), { recursive: true, force: true });
+  await rm(join(process.cwd(), ".test-auth"), { recursive: true, force: true });
 }

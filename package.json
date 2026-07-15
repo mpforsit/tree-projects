@@ -10,7 +10,7 @@
     "test": "vitest run",
     "test:e2e": "playwright test",
     "db:migrate": "node --experimental-strip-types scripts/migrate.ts",
-    "test:sql": "psql \"$DATABASE_URL_OWNER\" -v ON_ERROR_STOP=1 -q -f tests/sql/m1_schema.sql && psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -q -f tests/sql/m3_rls.sql",
+    "test:sql": "psql \"$DATABASE_URL_OWNER\" -v ON_ERROR_STOP=1 -q -f tests/sql/m1_schema.sql && psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -q -f tests/sql/m3_rls.sql && psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -q -f tests/sql/m7_search.sql",
     "db:reset": "node --experimental-strip-types scripts/reset.ts",
     "worker:alarms": "node --experimental-strip-types scripts/worker-alarms.ts"
   },

@@ -4,28 +4,35 @@
  * confirmed).
  */
 import { expect, test } from "@playwright/test";
-import { loginViaOtp } from "./helpers.ts";
+import { authState } from "./helpers.ts";
 
-test("switching tenants swaps the whole tree", async ({ page }) => {
-  await loginViaOtp(page, "mpiksa@forsit.de");
-  await page.getByRole("link", { name: "Forsit", exact: true }).click();
-  await expect(page.getByTestId("glance-card").filter({ hasText: "myWell" })).toBeVisible();
+test.describe("as MB (two tenants)", () => {
+  test.use({ storageState: authState("mb") });
 
-  await page.getByTestId("avatar-button").click();
-  await page.getByTestId("avatar-menu").getByRole("link", { name: "Nebenwerk GmbH" }).click();
-  await expect(page.getByTestId("tenant-name")).toHaveText("Nebenwerk GmbH");
-  await expect(
-    page.getByTestId("glance-card").filter({ hasText: "Büroumbau 2026" }),
-  ).toBeVisible();
-  await expect(page.getByText("myWell")).not.toBeVisible();
+  test("switching tenants swaps the whole tree", async ({ page }) => {
+    await page.goto("/"); // two tenants → picker
+    await page.getByRole("link", { name: "Forsit", exact: true }).click();
+    await expect(page.getByTestId("glance-card").filter({ hasText: "myWell" })).toBeVisible();
+
+    await page.getByTestId("avatar-button").click();
+    await page.getByTestId("avatar-menu").getByRole("link", { name: "Nebenwerk GmbH" }).click();
+    await expect(page.getByTestId("tenant-name")).toHaveText("Nebenwerk GmbH");
+    await expect(
+      page.getByTestId("glance-card").filter({ hasText: "Büroumbau 2026" }),
+    ).toBeVisible();
+    await expect(page.getByText("myWell")).not.toBeVisible();
+  });
 });
 
-test("deep link into a foreign tenant 404s", async ({ page }) => {
-  // IK is a member of forsit only → lands there directly (single tenant).
-  await loginViaOtp(page, "igor.kraus@forsit.de");
-  await expect(page.getByTestId("tenant-name")).toHaveText("Forsit");
+test.describe("as IK (forsit only)", () => {
+  test.use({ storageState: authState("ik") });
 
-  await page.goto("/nebenwerk");
-  await expect(page.getByText("404")).toBeVisible();
-  await expect(page.getByText("Nicht gefunden.")).toBeVisible();
+  test("deep link into a foreign tenant 404s", async ({ page }) => {
+    await page.goto("/forsit");
+    await expect(page.getByTestId("tenant-name")).toHaveText("Forsit");
+
+    await page.goto("/nebenwerk");
+    await expect(page.getByText("404")).toBeVisible();
+    await expect(page.getByText("Nicht gefunden.")).toBeVisible();
+  });
 });
