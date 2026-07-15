@@ -14,9 +14,11 @@ interface Props {
   displayName: string;
   tenants: { slug: string; name: string }[];
   activeSlug: string;
+  /** Renders the admin link — hidden for non-admins (§15.2: structural). */
+  isTenantAdmin?: boolean;
 }
 
-export function AvatarMenu({ displayName, tenants, activeSlug }: Props) {
+export function AvatarMenu({ displayName, tenants, activeSlug, isTenantAdmin }: Props) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const initials = displayName
@@ -92,6 +94,16 @@ export function AvatarMenu({ displayName, tenants, activeSlug }: Props) {
             zIndex: 10,
           }}
         >
+          {isTenantAdmin && (
+            <Link
+              href={`/${activeSlug}/admin`}
+              style={item}
+              data-testid="admin-link"
+              onClick={() => setOpen(false)}
+            >
+              {strings.admin.navLabel}
+            </Link>
+          )}
           <button type="button" style={item} onClick={toggleTheme}>
             {strings.shell.themeToggle}
           </button>

@@ -5,8 +5,10 @@ import { notFound, redirect } from "next/navigation";
 import { AvatarMenu } from "@/components/avatar-menu";
 import { SearchBox } from "@/components/search-box";
 import { getSessionUser } from "@/lib/auth";
+import { withTenantContext } from "@/lib/db";
 import { strings } from "@/lib/strings";
 import { userTenants } from "@/lib/tenants";
+import { fetchViewer } from "@/lib/tree";
 
 /**
  * Tenant boundary: the slug is validated against the session's
@@ -26,6 +28,10 @@ export default async function TenantLayout({
   const tenants = await userTenants(user.id);
   const active = tenants.find((t) => t.slug === slug);
   if (!active) notFound();
+  const viewer = await withTenantContext(
+    { userId: user.id, tenantId: active.id },
+    fetchViewer,
+  );
 
   return (
     <>
@@ -61,6 +67,7 @@ export default async function TenantLayout({
             displayName={user.name}
             activeSlug={active.slug}
             tenants={tenants.map(({ slug: s, name }) => ({ slug: s, name }))}
+            isTenantAdmin={Boolean(viewer?.is_tenant_admin)}
           />
         </nav>
       </header>

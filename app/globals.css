@@ -385,3 +385,14 @@ input {
 .view-fade {
   animation: view-fade 180ms ease-out;
 }
+
+/* ------------------------------------------------------ admin (§15.1) */
+
+.admin-input {
+  padding: 6px 9px;
+  border-radius: 7px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--ink);
+  font-size: 12.5px;
+}
