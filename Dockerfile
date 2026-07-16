@@ -20,11 +20,13 @@ RUN addgroup -S app && adduser -S app -G app
 COPY --from=build /app/.next/standalone ./
 COPY --from=build /app/.next/static ./.next/static
 COPY --from=build /app/public ./public
-# Migrations + runner ship with the image so the deploy pipeline can run
-# `node --experimental-strip-types scripts/migrate.ts` (as the owner role)
-# before starting the app.
+# Migrations, scripts, and their lib imports ship with the image so the
+# deploy pipeline can run `node --experimental-strip-types
+# scripts/migrate.ts` (owner role) before app start, and the scheduled
+# task can run scripts/worker-alarms.ts (imports lib/log.ts).
 COPY --from=build /app/db ./db
 COPY --from=build /app/scripts ./scripts
+COPY --from=build /app/lib ./lib
 USER app
 EXPOSE 3000
 CMD ["node", "server.js"]

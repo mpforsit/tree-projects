@@ -1,83 +1,124 @@
-# TreeOps — Operations (Coolify)
+# TreeOps — Operations-Runbook (Coolify)
 
-Operator checklist and procedures for the M0 deployment baseline
-(implementation plan M0). Items marked ☐ are performed on the Coolify
-server by the operator; they cannot be done from the repository.
+Konkrete Einrichtung von Staging und Produktion auf dem dedizierten
+Server (Plan M0/M9, Spec §12). Reihenfolge einhalten: erst Staging
+komplett inkl. Restore-Probe, dann Produktion.
 
-## Coolify layout
+## 0. Vorbereitung (einmalig)
 
-Two separate Coolify projects on the dedicated server:
+- DNS: `staging.<domain>` und `<domain>` auf den Server zeigen lassen
+  (Coolify übernimmt TLS via Let's Encrypt).
+- S3-kompatibles Backup-Ziel bereitstellen (Bucket + Access/Secret Key).
+- SMTP-Zugangsdaten des Relays bereitlegen (z. B. das vorhandene
+  Brevo-Konto): Host, Port, User, Passwort, Absenderadresse.
+- Zwei starke Passwörter je Umgebung generieren: für `app_user` und
+  `auth_user` (die Rollen legt Migration 0015/0019 an, Passwörter setzt
+  du in Schritt 3).
 
-| Project | Resources | Seeded |
-|---|---|---|
-| `treeops-staging` | PostgreSQL 16 · Next.js app (Dockerfile) · scheduled task (alarm worker) | yes (`db:reset`) |
-| `treeops-production` | same | **never** |
+## 1. Coolify-Projekt `treeops-staging`
 
-Internal networking between app and Postgres; nothing but the app is
-exposed publicly.
+### 1.1 PostgreSQL-16-Ressource
 
-## Setup checklist (per project)
+- Image: `postgres:16` (Standard — enthält ltree/citext/btree_gist).
+- Öffentlichen Zugriff AUS lassen (nur internes Netzwerk).
+- Notieren: interne Host-Adresse, DB-Name, Superuser-Zugang → daraus
+  wird `DATABASE_URL_OWNER`. Der Coolify-Hauptnutzer ist Superuser und
+  erfüllt damit die BYPASSRLS-Anforderung (alle Tabellen sind
+  `FORCE ROW LEVEL SECURITY`; SECURITY-DEFINER-Funktionen laufen als
+  Owner).
 
-- ☐ PostgreSQL 16 resource created; `ltree`, `citext`, `btree_gist` are in the
-  standard image (created by migration 0001).
-- ☐ **Scheduled backups to the S3-compatible target configured** — mandatory
-  before the first real tenant. Verify the first backup ran.
-- ☐ **Restore test performed** (procedure below) — a backup that has never
-  been restored is a hope, not a backup. Record date + duration (RTO) here.
-- ☐ Next.js app resource: Dockerfile deploy from this repository.
-- ☐ Pre-deployment command (runs before app start, as the owner role):
+### 1.2 App-Ressource (Next.js)
+
+- Quelle: dieses Repository, Branch der Umgebung; **Build Pack:
+  Dockerfile** (liegt im Repo-Root, Port 3000).
+- **Pre-Deployment Command** (läuft vor jedem Start, als Owner):
   `node --experimental-strip-types scripts/migrate.ts`
-- ☐ Secrets set via Coolify environment variables: `APP_ENV`,
-  `DATABASE_URL_OWNER` (owner role, used only by the migration step),
-  `DATABASE_URL` (app_user role), `SMTP_*`.
-- ☐ **Roles (M3):** the owner role must bypass RLS — every table is
-  `FORCE ROW LEVEL SECURITY` and the SECURITY DEFINER functions run as the
-  owner. The Coolify Postgres main user is a superuser (bypasses
-  inherently); for a non-superuser owner run once as superuser:
-  `ALTER ROLE <owner> BYPASSRLS;`
-- ☐ **app_user password (production):** migration 0015 creates the LOGIN
-  role without a password. Set it once as the owner:
-  `ALTER ROLE app_user PASSWORD '<secret>';` and put the same value into
-  `DATABASE_URL`. (Dev/staging: `pnpm db:reset` sets `treeops`.)
-- ☐ Scheduled task every 30 min:
+- **Healthcheck**: Pfad `/api/health`, Port 3000 (antwortet 200, wenn
+  die App Postgres als `app_user` erreicht; ohne Session aufrufbar).
+- Environment-Variablen (Coolify-Secrets):
+
+  | Variable | Wert |
+  |---|---|
+  | `APP_ENV` | `staging` (Produktion: `production`) |
+  | `DATABASE_URL_OWNER` | `postgres://<superuser>:<pw>@<pg-host>:5432/<db>` |
+  | `DATABASE_URL` | `postgres://app_user:<pw>@<pg-host>:5432/<db>` |
+  | `AUTH_DATABASE_URL` | `postgres://auth_user:<pw>@<pg-host>:5432/<db>` |
+  | `BETTER_AUTH_URL` | öffentliche URL, z. B. `https://staging.<domain>` |
+  | `BETTER_AUTH_SECRET` | 32+ zufällige Zeichen, pro Umgebung einzigartig |
+  | `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASSWORD` / `SMTP_FROM` | Relay-Zugang |
+  | `ENTRA_TENANT_ID` / `ENTRA_CLIENT_ID` / `ENTRA_CLIENT_SECRET` | optional — erst nach der SSO-Probe (Schritt 6) |
+
+### 1.3 Rollen-Passwörter (einmalig, nach dem ersten Deploy)
+
+Der erste Deploy lässt die Migrationen laufen (legt `app_user` /
+`auth_user` an), die App startet aber erst gesund, wenn die Rollen
+Passwörter haben. Einmalig als Owner auf der Postgres-Ressource:
+
+```sql
+ALTER ROLE app_user PASSWORD '<pw-aus-schritt-0>';
+ALTER ROLE auth_user PASSWORD '<pw-aus-schritt-0>';
+```
+
+Danach App re-deployen/neustarten → Healthcheck wird grün.
+
+### 1.4 Seed (nur Staging!)
+
+Einmalig in einem Terminal der App-Ressource (oder von außen mit den
+Staging-URLs):
+
+```bash
+APP_ENV=staging node --experimental-strip-types scripts/reset.ts
+```
+
+`scripts/reset.ts` verweigert `APP_ENV=production` hart; Produktion wird
+nie geseedet.
+
+### 1.5 Scheduled Task: Alarm-Worker
+
+- Coolify Scheduled Task auf der App-Ressource, **alle 30 Minuten**:
   `node --experimental-strip-types scripts/worker-alarms.ts`
-  (M0: heartbeat only; becomes the alarm engine in M5). Verify a heartbeat
-  line appears in the task log.
-- ☐ SMTP relay credentials wired; test mail sent and received.
-- ☐ Staging only: seed via `pnpm db:reset`. Production is never seeded and
-  `db:reset` refuses to run there (`APP_ENV=production`).
+- Verifizieren: Task-Log zeigt
+  `alarm evaluation pass complete {raised: …, cleared: …}`.
 
-## Backup restore procedure
+### 1.6 Backups + Restore-Probe (Pflicht vor dem ersten echten Tenant)
 
-1. Create a scratch database on the Postgres resource:
-   `CREATE DATABASE treeops_restore_test;`
-2. Fetch the latest dump from the S3 target.
-3. `pg_restore --no-owner --dbname=treeops_restore_test <dump>`
-   (or `psql -f` for plain-format dumps).
-4. Sanity check: `SELECT count(*) FROM tenant;` and one domain table.
-5. Drop the scratch database.
+- Auf der Postgres-Ressource: Scheduled Backups → S3-Ziel, täglich,
+  Aufbewahrung nach Bedarf. Ersten Lauf abwarten und prüfen.
+- **Restore-Probe** (ein Backup, das nie zurückgespielt wurde, ist eine
+  Hoffnung, kein Backup):
+  1. `CREATE DATABASE treeops_restore_test;`
+  2. Jüngsten Dump vom S3-Ziel holen.
+  3. `pg_restore --no-owner --dbname=treeops_restore_test <dump>`
+     (bzw. `psql -f` bei Plain-Format).
+  4. Stichprobe: `SELECT count(*) FROM tenant;` + eine Domänentabelle.
+  5. Scratch-DB wieder löschen; Dauer unten als RTO eintragen.
 
-Record here after each rehearsal:
-
-| Date | Environment | Duration (RTO) | Result |
+| Datum | Umgebung | Dauer (RTO) | Ergebnis |
 |---|---|---|---|
-| _pending_ | staging | — | — |
+| _ausstehend_ | staging | — | — |
 
-## Verify (M0 definition of done)
+## 2. Coolify-Projekt `treeops-production`
 
-- Push-to-deploy works on staging.
-- A throwaway table survives backup + restore into a scratch database.
-- The scheduled task logs a heartbeat.
+Wie Staging (1.1–1.3, 1.5, 1.6) mit eigener Datenbank, eigenen
+Passwörtern, eigenem `BETTER_AUTH_SECRET` — und **ohne 1.4**: kein Seed,
+niemals. Ersten Tenant + Tenant-Admin legt der Instance-Admin unter
+`/instance` an (der Instance-Admin-User selbst wird einmalig per SQL als
+Owner angelegt: `INSERT INTO "user" (email, display_name,
+is_instance_admin) VALUES ('<mail>', '<name>', true);`).
 
-## Release checklist additions (M9)
+## 3. Release-Verifikation (M9)
 
-- ☐ **Entra go-live:** after setting the `ENTRA_*` secrets, perform ONE
-  real "Sign in with Microsoft" on staging (allowlisted tid + a
-  non-allowlisted account, which must be rejected) before enabling the
-  button in production — the OIDC flow is not covered by CI e2e.
-- ☐ **Performance re-check on staging hardware:** run
-  `scripts/perf.ts` against the staging build (see docs/PERF.md);
-  target < 200 ms for glance/branch/my-work.
-- ☐ Ops rehearsal (plan M9): restore staging from last night's backup
-  into a scratch database, record duration (RTO) in the table above;
-  verify the production project has no seed, secrets set, backups green.
+- ☐ Push-to-Deploy auf Staging funktioniert; Healthcheck grün.
+- ☐ Worker-Heartbeat im Task-Log (1.5).
+- ☐ Restore-Probe durchgeführt, RTO dokumentiert (1.6).
+- ☐ OTP-Login auf Staging mit einem Seed-Nutzer; Mail kommt über das
+  Relay an.
+- ☐ **Performance-Nachmessung auf Staging-Hardware**: `scripts/perf.ts`
+  gegen den Staging-Build (siehe docs/PERF.md); Ziel < 200 ms für
+  Glance/Branch/My-Work.
+- ☐ **Entra-Probe vor Produktions-Freischaltung**: `ENTRA_*` auf Staging
+  setzen, EIN echter „Sign in with Microsoft“ mit allowlisted tid UND
+  ein Nicht-Allowlisted-Konto (muss abgewiesen werden) — der OIDC-Fluss
+  ist nicht CI-abgedeckt.
+- ☐ Produktion: Secrets gesetzt, kein Seed, Backups grün, Healthcheck
+  grün.

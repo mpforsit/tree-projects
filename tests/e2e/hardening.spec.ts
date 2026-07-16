@@ -107,6 +107,12 @@ test.describe("string-length audit at ~95-char titles (as MS)", () => {
   });
 });
 
+test("/api/health answers without a session (Coolify probe)", async ({ request }) => {
+  const response = await request.get("/api/health");
+  expect(response.status()).toBe(200);
+  expect(await response.json()).toEqual({ status: "ok" });
+});
+
 test.describe("accessibility baseline (as MB)", () => {
   test.use({ storageState: authState("mb") });
 

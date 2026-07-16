@@ -69,6 +69,17 @@ async function runInContext<T>(
   }
 }
 
+/** Liveness probe (Coolify healthcheck): app_user connection + trivial
+ *  query — no tenant context, touches no domain rows. */
+export async function pingDb(): Promise<void> {
+  const client = await getPool().connect();
+  try {
+    await client.query("SELECT 1");
+  } finally {
+    client.release();
+  }
+}
+
 /** For workers/tests: drain the pool so the process can exit. */
 export async function closePool(): Promise<void> {
   if (pool) {
