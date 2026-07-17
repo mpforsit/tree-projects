@@ -63,15 +63,21 @@ Danach App re-deployen/neustarten → Healthcheck wird grün.
 
 ### 1.4 Seed (nur Staging!)
 
-Einmalig in einem Terminal der App-Ressource (oder von außen mit den
-Staging-URLs):
+Einmalig im **Terminal der App-Ressource** (Coolify → App → Terminal),
+nachdem die Rollen-Passwörter gesetzt sind (1.3):
 
 ```bash
-APP_ENV=staging node --experimental-strip-types scripts/reset.ts
+node --experimental-strip-types scripts/seed.ts
 ```
 
-`scripts/reset.ts` verweigert `APP_ENV=production` hart; Produktion wird
-nie geseedet.
+`scripts/seed.ts` lädt nur `db/seed/seed.sql` in die bereits migrierte DB
+(die Migrationen liefen im Pre-Deployment-Schritt), fasst Rollen und
+Passwörter **nicht** an und ist idempotent (überspringt, wenn schon
+Tenants existieren). `APP_ENV=production` wird hart verweigert.
+
+Nicht `scripts/reset.ts` auf Staging verwenden — das droppt das Schema
+und setzt die Rollen-Passwörter auf den Dev-Wert `treeops` zurück; es ist
+nur für lokale Entwicklung/e2e gedacht.
 
 ### 1.5 Scheduled Task: Alarm-Worker
 
