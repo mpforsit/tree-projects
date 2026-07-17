@@ -9,8 +9,13 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import pg from "pg";
 
-if (process.env.APP_ENV === "production" || process.env.NODE_ENV === "production") {
-  throw new Error("seeding is disabled in production");
+// Guard on APP_ENV only: the production Docker image always sets
+// NODE_ENV=production (Next.js runtime requirement), so NODE_ENV cannot
+// distinguish staging from production. APP_ENV is the deployment signal.
+if (process.env.APP_ENV === "production" || !process.env.APP_ENV) {
+  throw new Error(
+    "seeding requires APP_ENV set to a non-production value (e.g. staging)",
+  );
 }
 
 const url = process.env.DATABASE_URL_OWNER;
