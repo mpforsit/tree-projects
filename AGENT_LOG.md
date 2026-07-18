@@ -446,3 +446,28 @@ green after each migration; build clean.
   staging misses the 200 ms target.
 - Phase-2 seams stay dormant as planned (estimate field, exported_at,
   Teams capture, digest).
+
+---
+
+## 2026-07-18 — DB-Struktur als Diagramm (docs/SCHEMA.md)
+
+**Done:** Auf Nachfrage die aktuelle Datenbankstruktur als Diagramm
+dokumentiert. `docs/SCHEMA.md` enthält ein Mermaid-`erDiagram` aller
+Domänentabellen (tenant, user, member, node, membership, time_log,
+info_piece, comment, event, domain_claim, user_preference) plus der
+better-auth-Tabellen, dazu die Enum-Tabelle, die Sichten/Funktionen
+(visible_nodes, task_time_totals, last_progress_at, search_visible,
+evaluate_alarms, Rollup-Trigger) und **je Tabelle eine echte Beispielzeile
+aus dem Seed** (Tenant forsit/nebenwerk; Beispielknoten t1 =
+„Zahlungsanbieter-Integration abschließen (Stripe → Mollie)", blocked/60 %/
+due 2026-07-17/due_soon).
+
+**Files:** `docs/SCHEMA.md` (neu).
+
+**Reasoning:** Markdown + Mermaid statt separatem Bild — rendert direkt auf
+GitHub, passt zur docs/*.md-Konvention, bleibt versioniert und diffbar. Die
+Beispiele stammen 1:1 aus `db/seed/seed.sql`, Spaltendefinitionen aus den
+Migrationen 0001–0028 (Quelle der Wahrheit bleibt SQL).
+
+**Caveats:** Reine Doku, kein Schema-Change; nichts zu testen. Bei künftigen
+Migrationen mitziehen (Kopf nennt den Stand 0001–0028).
