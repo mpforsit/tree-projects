@@ -120,11 +120,12 @@ is_instance_admin) VALUES ('<mail>', '<name>', true);`).
 
 ## 3. Release-Verifikation (M9)
 
-- ☐ Push-to-Deploy auf Staging funktioniert; Healthcheck grün.
-- ☐ Worker-Heartbeat im Task-Log (1.5).
-- ☐ Restore-Probe durchgeführt, RTO dokumentiert (1.6).
-- ☐ OTP-Login auf Staging mit einem Seed-Nutzer; Mail kommt über das
-  Relay an.
+- ☑ Push-to-Deploy auf Staging funktioniert; Healthcheck grün. (2026-07-17)
+- ☑ Worker (`evaluate_alarms`) im Scheduled-Task-Log: erster Lauf
+  `raised: 19, cleared: 0` gegen die Seed-Daten. (2026-07-18)
+- ☑ Restore-Probe durchgeführt, RTO ~0,65 s dokumentiert (1.6). (2026-07-17)
+- ☑ OTP-Login auf Staging (`mpiksa@forsit.de`); Mail kam über das Relay
+  an, Picker + Glance geladen. (2026-07-17)
 - ☐ **Performance-Nachmessung auf Staging-Hardware**: `scripts/perf.ts`
   gegen den Staging-Build (siehe docs/PERF.md); Ziel < 200 ms für
   Glance/Branch/My-Work.
