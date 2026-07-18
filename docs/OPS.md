@@ -99,9 +99,15 @@ nur für lokale Entwicklung/e2e gedacht.
   4. Stichprobe: `SELECT count(*) FROM tenant;` + eine Domänentabelle.
   5. Scratch-DB wieder löschen; Dauer unten als RTO eintragen.
 
+Backup-Ziel Staging: Hetzner Object Storage (Helsinki,
+`https://hel1.your-objectstorage.com`), in Coolify als S3-Storage
+`hetzner-hel1` registriert (instanzweit, für mehrere Projekte
+wiederverwendbar). Postgres-Ressource → Backups: täglich `0 3 * * *`,
+Custom-Format (`.dmp`).
+
 | Datum | Umgebung | Dauer (RTO) | Ergebnis |
 |---|---|---|---|
-| _ausstehend_ | staging | — | — |
+| 2026-07-17 | staging | ~0,65 s | bestanden — pg_restore des `.dmp` in Scratch-DB; 2 Tenants, voller Baum, 88 Events wiederhergestellt |
 
 ## 2. Coolify-Projekt `treeops-production`
 
