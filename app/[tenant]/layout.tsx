@@ -50,7 +50,7 @@ export default async function TenantLayout({
           href={`/${active.slug}`}
           style={{ fontWeight: 700, fontSize: 14.5, color: "var(--ink)" }}
         >
-          TreeOps
+          Lean
         </Link>
         <span data-testid="tenant-name" style={{ fontSize: 12.5, color: "var(--mut)" }}>
           {active.name}

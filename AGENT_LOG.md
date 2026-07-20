@@ -471,3 +471,67 @@ Migrationen 0001–0028 (Quelle der Wahrheit bleibt SQL).
 
 **Caveats:** Reine Doku, kein Schema-Change; nichts zu testen. Bei künftigen
 Migrationen mitziehen (Kopf nennt den Stand 0001–0028).
+
+---
+
+## 2026-07-20 — Projekt umbenannt: TreeOps → Lean
+
+**Done:** Produktname im gesamten Code (UI-Text, package.json, Docker/Dev-Zugangsdaten,
+localStorage-/sessionStorage-Keys, Seed-/Test-E-Mail-Domain, Docs-Titel)
+von „TreeOps" auf „Lean" umgestellt — 30 Dateien, reine 1:1-Umbenennung, keine
+Verhaltensänderung. Bewusst **nicht** angefasst:
+- Dateinamen der vier normativen Referenzdokumente
+  (`treeops-spec-v1.2.md`, `treeops-design-handover.md`,
+  `treeops-design-brief.md`, `treeops-implementation-plan-phase1.md`) und
+  des Prototyps `TreeOps.dc.html` — bleiben als gegebene Referenz-Artefakte
+  unter ihrem Originalnamen; nur die Produktname-Vorkommen *im Fließtext*
+  dieser Markdown-Dateien wurden mitgezogen (Titelzeilen etc.), der
+  Prototyp selbst (HTML-Inhalt) bleibt komplett unverändert (Pixel-Referenz).
+- Kommentare in bereits gemergten Migrationen (0015, 0019) — CLAUDE.md:
+  „db/migrations/ … never edited after merge".
+- AGENT_LOG.md-Historie (der `/var/lib/postgresql/treeops-pgdata`-Eintrag
+  vom 2026-07-xx beschreibt einen realen, damals so benannten Systempfad).
+- GitHub-Repo-Name `mpforsit/tree-projects` — Hosting-Einstellung, keine
+  Code-Änderung; müsste der Owner separat in GitHub umbenennen.
+
+**Files:** u. a. CLAUDE.md, README.md, package.json, .env.example,
+docker-compose.yml, Dockerfile, lib/strings.ts, lib/mail.ts, app/layout.tsx,
+app/no-access/page.tsx, app/[tenant]/layout.tsx, components/login-form.tsx,
+components/avatar-menu.tsx, components/glance-card.tsx, components/zoom-in.tsx,
+app/globals.css, scripts/reset.ts, scripts/perf.ts, db/seed/seed.sql,
+tests/e2e/{login,admin,hardening,helpers}, docs/{OPS,PERF,SCHEMA}.md,
+docs/treeops-{spec-v1.2,design-handover,design-brief,implementation-plan-phase1}.md
+(Titel/Fließtext).
+
+**Reasoning:** Konsistente 1:1-Ersetzung „TreeOps"→„Lean" und „treeops"→„lean"
+je nach Schreibweise am Fundort (UI-Text, localStorage-Key, Dev-Passwort,
+E-Mail-Domain). `lib/strings.ts`-Schlüssel `openTreeOps` → `openLean`
+inkl. der einzigen Verwendungsstelle (`components/login-form.tsx`). Seed-
+und Test-E-Mail-Domain `treeops.forsit.de` → `lean.forsit.de` konsistent in
+`db/seed/seed.sql` UND den drei referenzierenden e2e-Tests geändert, sonst
+wären die Tests gegen eine nicht mehr existierende Adresse gelaufen.
+
+**Verify:** `tsc --noEmit` clean; lokaler Cluster (`treeops-pgdata`,
+Port 5433) hochgefahren, `scripts/reset.ts` mit den neuen Werten
+(Rollenpasswort `lean`) durchlaufen; **111/111 Vitest-Unit-Tests grün**;
+**alle 4 SQL-Suiten grün** (m1_schema, m3_rls, m7_search, m9_security).
+Playwright-e2e nicht in dieser Session ausgeführt (kein Browser-Lauf nötig
+für reine String-Ersetzung; die vier betroffenen Spec-Dateien wurden
+konsistent mitgezogen).
+
+**Caveats / follow-ups**
+
+- **Staging hat bereits `admin@treeops.forsit.de` geseedet** (einmaliger,
+  idempotenter Seed-Lauf vom 2026-07-17) — der Code verwendet ab jetzt
+  `admin@lean.forsit.de` für neue Umgebungen, aber die bestehende
+  Staging-Zeile wird dadurch NICHT nachträglich geändert. Bei Bedarf per
+  manuellem `UPDATE "user" SET email = 'admin@lean.forsit.de' WHERE id = …`
+  auf Staging nachziehen — nicht automatisch gemacht (Datenänderung auf
+  einer laufenden Umgebung).
+- Lokale, nicht versionierte `.env`-Dateien (falls vorhanden) müssen von
+  Hand auf die neuen Dev-Konventionen (`lean_owner`/`lean`/`lean` statt
+  `treeops_owner`/`treeops`/`treeops`) nachgezogen werden — `.env` liegt
+  nicht im Repo, wurde daher nicht angefasst.
+- Tag `v1.0.0-phase1` (lokal, nicht gepusht) und der Coolify-Projektname
+  auf dem Server bleiben unverändert — Umbenennen dort ist eine separate
+  Ops-/Hosting-Aktion, keine Code-Änderung.

@@ -40,7 +40,7 @@ export async function sendMail(mail: Mail): Promise<void> {
       : undefined,
   });
   await transport.sendMail({
-    from: process.env.SMTP_FROM ?? "treeops@example.com",
+    from: process.env.SMTP_FROM ?? "lean@example.com",
     to: mail.to,
     subject: mail.subject,
     text: mail.text,

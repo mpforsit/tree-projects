@@ -32,10 +32,10 @@ export function AvatarMenu({ displayName, tenants, activeSlug, isTenantAdmin }: 
     const dark = document.body.dataset.theme === "dark";
     if (dark) {
       delete document.body.dataset.theme;
-      localStorage.setItem("treeops.theme", "light");
+      localStorage.setItem("lean.theme", "light");
     } else {
       document.body.dataset.theme = "dark";
-      localStorage.setItem("treeops.theme", "dark");
+      localStorage.setItem("lean.theme", "dark");
     }
   }
 

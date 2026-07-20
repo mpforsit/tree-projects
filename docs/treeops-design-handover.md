@@ -1,4 +1,4 @@
-# TreeOps — Design Handover (v1)
+# Lean — Design Handover (v1)
 
 For the implementing agent. Read together with `uploads/treeops-spec-v1.md` (domain model, permissions, rollup logic) and the interactive reference prototype `TreeOps.dc.html` (all layout values are inline in its markup; its mock data mirrors the spec's domain model). Where this document and the prototype disagree, this document wins.
 
@@ -46,7 +46,7 @@ CSS custom properties, light and dark (declared on `body` / `body[data-theme="da
 | --teams | #4B53A8 | #9AA1E8 | Teams source badge |
 | --aibg / --aibd | #FAF8FD / #E5DEF1 | #221F2C / #39334D | AI info-piece tint |
 
-Badge tints use fixed translucent rgba of the signal color, identical in both themes, e.g. blocked: `background:rgba(122,94,168,.09); border:1px solid rgba(122,94,168,.28)`. Dark mode: persisted in `localStorage('treeops.theme')`, applied as `data-theme="dark"` on `<body>`.
+Badge tints use fixed translucent rgba of the signal color, identical in both themes, e.g. blocked: `background:rgba(122,94,168,.09); border:1px solid rgba(122,94,168,.28)`. Dark mode: persisted in `localStorage('lean.theme')`, applied as `data-theme="dark"` on `<body>`.
 
 **Progress color ramp** (continuous, gray → amber → teal). Piecewise-linear RGB interpolation between anchors; implement exactly:
 
@@ -86,7 +86,7 @@ Rail: responsible + due date · **Status control**: 4 segments offen / in Arbeit
 
 **My Work.** "Meine Alarme" module (alarm badge pill 78px + title + branch path + due) above a cross-tree list grouped by urgency headers: Überfällig → Bald fällig → Stagniert → Weitere. Rows = branch-view rows plus a second line: branch path ("Werkbank — internes Tooling", "myWell › App Relaunch 2.0").
 
-**Login** (English). Invitation banner card (inviter avatar + "X invited you to join Y") · panel: logo, "Welcome", email input → "Continue with email" → code step: "Check your inbox", 6 digit boxes 44×52px, auto-advance on input, Backspace moves back, digits only, `autocomplete="one-time-code"`, "Send a new code" · success: teal check, "You're in.", "Open TreeOps" · divider "or" · "Sign in with Microsoft" (4-square logo) · footer: "Invitation-only — there is no public sign-up." Rate limits/expiry per spec §8.
+**Login** (English). Invitation banner card (inviter avatar + "X invited you to join Y") · panel: logo, "Welcome", email input → "Continue with email" → code step: "Check your inbox", 6 digit boxes 44×52px, auto-advance on input, Backspace moves back, digits only, `autocomplete="one-time-code"`, "Send a new code" · success: teal check, "You're in.", "Open Lean" · divider "or" · "Sign in with Microsoft" (4-square logo) · footer: "Invitation-only — there is no public sign-up." Rate limits/expiry per spec §8.
 
 ## 5. Motion
 

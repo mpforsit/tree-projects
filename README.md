@@ -1,4 +1,4 @@
-# TreeOps
+# Lean
 
 Multi-tenant, self-hosted hierarchical portfolio/project/task management.
 Deliberately minimal. See `CLAUDE.md` for project context and

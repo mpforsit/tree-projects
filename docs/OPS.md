@@ -1,4 +1,4 @@
-# TreeOps — Operations-Runbook (Coolify)
+# Lean — Operations-Runbook (Coolify)
 
 Konkrete Einrichtung von Staging und Produktion auf dem dedizierten
 Server (Plan M0/M9, Spec §12). Reihenfolge einhalten: erst Staging
@@ -15,7 +15,7 @@ komplett inkl. Restore-Probe, dann Produktion.
   `auth_user` (die Rollen legt Migration 0015/0019 an, Passwörter setzt
   du in Schritt 3).
 
-## 1. Coolify-Projekt `treeops-staging`
+## 1. Coolify-Projekt `lean-staging`
 
 ### 1.1 PostgreSQL-16-Ressource
 
@@ -76,7 +76,7 @@ Passwörter **nicht** an und ist idempotent (überspringt, wenn schon
 Tenants existieren). `APP_ENV=production` wird hart verweigert.
 
 Nicht `scripts/reset.ts` auf Staging verwenden — das droppt das Schema
-und setzt die Rollen-Passwörter auf den Dev-Wert `treeops` zurück; es ist
+und setzt die Rollen-Passwörter auf den Dev-Wert `lean` zurück; es ist
 nur für lokale Entwicklung/e2e gedacht.
 
 ### 1.5 Scheduled Task: Alarm-Worker
@@ -92,9 +92,9 @@ nur für lokale Entwicklung/e2e gedacht.
   Aufbewahrung nach Bedarf. Ersten Lauf abwarten und prüfen.
 - **Restore-Probe** (ein Backup, das nie zurückgespielt wurde, ist eine
   Hoffnung, kein Backup):
-  1. `CREATE DATABASE treeops_restore_test;`
+  1. `CREATE DATABASE lean_restore_test;`
   2. Jüngsten Dump vom S3-Ziel holen.
-  3. `pg_restore --no-owner --dbname=treeops_restore_test <dump>`
+  3. `pg_restore --no-owner --dbname=lean_restore_test <dump>`
      (bzw. `psql -f` bei Plain-Format).
   4. Stichprobe: `SELECT count(*) FROM tenant;` + eine Domänentabelle.
   5. Scratch-DB wieder löschen; Dauer unten als RTO eintragen.
@@ -109,7 +109,7 @@ Custom-Format (`.dmp`).
 |---|---|---|---|
 | 2026-07-17 | staging | ~0,65 s | bestanden — pg_restore des `.dmp` in Scratch-DB; 2 Tenants, voller Baum, 88 Events wiederhergestellt |
 
-## 2. Coolify-Projekt `treeops-production`
+## 2. Coolify-Projekt `lean-production`
 
 Wie Staging (1.1–1.3, 1.5, 1.6) mit eigener Datenbank, eigenen
 Passwörtern, eigenem `BETTER_AUTH_SECRET` — und **ohne 1.4**: kein Seed,

@@ -1,4 +1,4 @@
-# TreeOps — Implementation Plan, Phase 1 (v1.2)
+# Lean — Implementation Plan, Phase 1 (v1.2)
 
 Companion to `CLAUDE.md` and spec v1.2. Ten milestones, strictly ordered. M0–M3 are the foundation (deployment, tenancy, security, rollup — most of the risk lives here), M4–M7 are the product, M8–M9 are hardening. Verification steps are written so Claude Code can self-check before moving on. **Every milestone from M1 onward ends deployable on Coolify staging.**
 
@@ -8,7 +8,7 @@ Companion to `CLAUDE.md` and spec v1.2. Ten milestones, strictly ordered. M0–M
 
 **Goal:** the Coolify pipeline exists and is boring before it matters.
 
-- Coolify projects `treeops-staging` and `treeops-production` on the dedicated server; per project: PostgreSQL 16 resource + placeholder Next.js app (Dockerfile "hello world") + internal networking.
+- Coolify projects `lean-staging` and `lean-production` on the dedicated server; per project: PostgreSQL 16 resource + placeholder Next.js app (Dockerfile "hello world") + internal networking.
 - **Postgres backups configured and restore-tested now** (scheduled dumps to S3-compatible target; document the restore procedure in `docs/OPS.md`) — a backup that has never been restored is a hope, not a backup.
 - Migration step in the deploy pipeline (runs as owner role before app start); `.env` handling via Coolify secrets; SMTP relay credentials wired and a test mail sent (mailpit locally).
 - Worker slot: Coolify scheduled task invoking a placeholder script every 30 min (becomes the alarm engine in M5).

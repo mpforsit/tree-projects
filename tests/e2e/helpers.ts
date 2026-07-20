@@ -25,5 +25,5 @@ export async function loginViaOtp(page: Page, email: string): Promise<void> {
   const mail = await latestMailTo(email, before);
   await page.getByLabel("Digit 1").fill(otpFrom(mail));
   await expect(page.getByText("You're in.")).toBeVisible();
-  await page.getByRole("button", { name: "Open TreeOps" }).click();
+  await page.getByRole("button", { name: "Open Lean" }).click();
 }

@@ -9,11 +9,11 @@ const instrumentSans = Instrument_Sans({
 });
 
 export const metadata = {
-  title: "TreeOps",
+  title: "Lean",
 };
 
 // Applies the persisted theme before first paint (handover §2).
-const themeInit = `try{var t=localStorage.getItem('treeops.theme');if(t==='dark'){document.body.dataset.theme='dark';}}catch(e){}`;
+const themeInit = `try{var t=localStorage.getItem('lean.theme');if(t==='dark'){document.body.dataset.theme='dark';}}catch(e){}`;
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (

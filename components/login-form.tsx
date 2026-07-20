@@ -106,7 +106,7 @@ export function LoginForm({ entra }: { entra: boolean }) {
 
   return (
     <div style={panel}>
-      <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 18 }}>TreeOps</div>
+      <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 18 }}>Lean</div>
 
       {step === "email" && (
         <form
@@ -274,7 +274,7 @@ export function LoginForm({ entra }: { entra: boolean }) {
               fontWeight: 600,
             }}
           >
-            {s.openTreeOps}
+            {s.openLean}
           </button>
         </div>
       )}

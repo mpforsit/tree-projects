@@ -42,7 +42,7 @@ export function GlanceCard({ slug, card }: { slug: string; card: GlanceCardData 
   function open(e: React.MouseEvent) {
     try {
       sessionStorage.setItem(
-        "treeops.zoom",
+        "lean.zoom",
         JSON.stringify({ x: e.clientX, y: e.clientY }),
       );
     } catch {

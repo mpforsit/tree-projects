@@ -15,10 +15,10 @@ export function ZoomIn({ children }: { children: ReactNode }) {
   useEffect(() => {
     let origin: { x: number; y: number } | null = null;
     try {
-      const raw = sessionStorage.getItem("treeops.zoom");
+      const raw = sessionStorage.getItem("lean.zoom");
       if (raw) {
         origin = JSON.parse(raw) as { x: number; y: number };
-        sessionStorage.removeItem("treeops.zoom");
+        sessionStorage.removeItem("lean.zoom");
       }
     } catch {
       /* no zoom origin */

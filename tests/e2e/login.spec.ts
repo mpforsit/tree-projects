@@ -51,20 +51,20 @@ test("an SSO-enforced domain cannot use OTP", async ({ page }) => {
   try {
     await db.query(
       `INSERT INTO domain_claim (domain, tenant_id, sso_enforced)
-       VALUES ('treeops.forsit.de', $1, true)`,
+       VALUES ('lean.forsit.de', $1, true)`,
       [TENANT_A],
     );
     await page.goto("/login");
-    await page.getByLabel("Email address").fill("admin@treeops.forsit.de");
+    await page.getByLabel("Email address").fill("admin@lean.forsit.de");
     await page.getByRole("button", { name: "Continue with email" }).click();
     await expect(page.getByText("This domain uses single sign-on")).toBeVisible();
     // still on the email step — no code entry appears
     await expect(page.getByText("Check your inbox")).not.toBeVisible();
     await expect(
-      latestMailTo("admin@treeops.forsit.de", Date.now() - 5_000, 2_000),
+      latestMailTo("admin@lean.forsit.de", Date.now() - 5_000, 2_000),
     ).rejects.toThrow(/no mail/);
   } finally {
-    await db.query("DELETE FROM domain_claim WHERE domain = 'treeops.forsit.de'");
+    await db.query("DELETE FROM domain_claim WHERE domain = 'lean.forsit.de'");
     await db.end();
   }
 });

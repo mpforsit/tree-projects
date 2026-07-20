@@ -1,4 +1,4 @@
--- TreeOps seed — staging/dev ONLY (scripts/reset.ts refuses in production).
+-- Lean seed — staging/dev ONLY (scripts/reset.ts refuses in production).
 --
 -- Two tenants (CLAUDE.md / plan M1):
 --   forsit    — the prototype tree with §15.3 corrections applied:
@@ -28,7 +28,7 @@ INSERT INTO "user" (id, email, display_name, is_instance_admin) VALUES
   ('e0000000-0000-4000-8000-000000000005', 'jonas.thal@forsit.de',    'Jonas T.',    false),
   -- Instance admin: manages tenants/domain registry, NO memberships,
   -- therefore no data access inside any tenant (invariant 6).
-  ('e0000000-0000-4000-8000-000000000006', 'admin@treeops.forsit.de', 'Instance Admin', true);
+  ('e0000000-0000-4000-8000-000000000006', 'admin@lean.forsit.de', 'Instance Admin', true);
 
 -- ---------------------------------------------------------------- members
 -- Tenant forsit: MB tenant-admin + HR; JT deliberately without

@@ -1,4 +1,4 @@
-# Design brief — TreeOps (working title)
+# Design brief — Lean (working title)
 
 ## What to produce
 
@@ -6,7 +6,7 @@ Design concept suggestions (visual direction + key screens) for a web applicatio
 
 ## The product in three sentences
 
-TreeOps is a hierarchical work-management tool for a portfolio of companies and projects: one big tree of areas, projects, and tasks with unlimited nesting. Its core promise is **"see at one glance how far everything has proceeded and where the problems are"** — then drill into any branch for detail. It is deliberately minimal: no Gantt charts, no sprints, no custom fields — a calm alternative to Jira/Monday, closer in spirit to Linear or Things.
+Lean is a hierarchical work-management tool for a portfolio of companies and projects: one big tree of areas, projects, and tasks with unlimited nesting. Its core promise is **"see at one glance how far everything has proceeded and where the problems are"** — then drill into any branch for detail. It is deliberately minimal: no Gantt charts, no sprints, no custom fields — a calm alternative to Jira/Monday, closer in spirit to Linear or Things.
 
 ## Primary user
 

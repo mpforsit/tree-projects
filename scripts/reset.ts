@@ -23,8 +23,8 @@ try {
   process.stdout.write(`applied: ${ran.join(", ")}\n`);
   // Dev/staging convenience: give the app and auth roles known passwords
   // (created in migrations 0015/0019; production sets its own, docs/OPS.md).
-  await client.query("ALTER ROLE app_user WITH LOGIN PASSWORD 'treeops'");
-  await client.query("ALTER ROLE auth_user WITH LOGIN PASSWORD 'treeops'");
+  await client.query("ALTER ROLE app_user WITH LOGIN PASSWORD 'lean'");
+  await client.query("ALTER ROLE auth_user WITH LOGIN PASSWORD 'lean'");
   const seed = await readFile(
     join(import.meta.dirname, "..", "db", "seed", "seed.sql"),
     "utf8",

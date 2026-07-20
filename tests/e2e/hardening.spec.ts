@@ -12,7 +12,7 @@ const MYWELL = "a1000000-0000-4000-8000-000000000002";
 
 async function darken(page: Page): Promise<void> {
   await page.addInitScript(() => {
-    localStorage.setItem("treeops.theme", "dark");
+    localStorage.setItem("lean.theme", "dark");
   });
 }
 

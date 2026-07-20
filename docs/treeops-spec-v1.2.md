@@ -1,4 +1,4 @@
-# TreeOps — Specification v1.2
+# Lean — Specification v1.2
 
 > Working title. Multi-tenant, self-hosted hierarchical portfolio/project/task management with time-weighted progress rollup, alarm system, membership-scoped visibility, event-sourced change log, and integration seams for Teams/Slack, time export, and an LLM query layer.
 >

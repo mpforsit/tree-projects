@@ -24,7 +24,7 @@ if (!OWNER_URL || !APP_URL) {
 }
 
 const PERF_USER_ID = "e0000000-0000-4000-8000-000000000099";
-const PERF_EMAIL = "perf.user@treeops-perf.example";
+const PERF_EMAIL = "perf.user@lean-perf.example";
 
 function median(values: number[]): number {
   const sorted = [...values].sort((a, b) => a - b);

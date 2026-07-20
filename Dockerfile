@@ -1,4 +1,4 @@
-# TreeOps — Next.js app image (Coolify Dockerfile deploy, spec §12)
+# Lean — Next.js app image (Coolify Dockerfile deploy, spec §12)
 FROM node:22-alpine AS base
 RUN corepack enable pnpm
 

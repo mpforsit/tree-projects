@@ -1,4 +1,4 @@
-# TreeOps — Performance-Messung (M9)
+# Lean — Performance-Messung (M9)
 
 Messumgebung: Sandbox-Container (geteilte CPU), Postgres 16 lokal,
 Next.js-**Produktions**-Build. Generierter Tenant `perf-a` (498 Knoten,

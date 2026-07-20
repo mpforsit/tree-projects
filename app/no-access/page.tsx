@@ -16,7 +16,7 @@ export default function NoAccess() {
       }}
     >
       <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 14, color: "var(--ink)" }}>
-        TreeOps
+        Lean
       </div>
       {strings.login.noMemberships}
     </div>

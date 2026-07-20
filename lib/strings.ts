@@ -4,7 +4,7 @@
  */
 export const strings = {
   placeholder: {
-    deploymentBaseline: "TreeOps — Deployment-Baseline (M0).",
+    deploymentBaseline: "Lean — Deployment-Baseline (M0).",
   },
   login: {
     // English by design — invitation links travel across organizations.
@@ -20,7 +20,7 @@ export const strings = {
     invalidCode: "That code is invalid or has expired.",
     sendNewCode: "Send a new code",
     youAreIn: "You're in.",
-    openTreeOps: "Open TreeOps",
+    openLean: "Open Lean",
     or: "or",
     signInWithMicrosoft: "Sign in with Microsoft",
     invitationOnly: "Invitation-only — there is no public sign-up.",
@@ -29,12 +29,12 @@ export const strings = {
     pickTenant: "Choose a workspace",
   },
   invitation: {
-    subject: (tenantName: string) => `You've been invited to ${tenantName} on TreeOps`,
+    subject: (tenantName: string) => `You've been invited to ${tenantName} on Lean`,
     body: (tenantName: string, url: string) =>
-      `You have been invited to join ${tenantName} on TreeOps.\n\nSign in with this email address to get started:\n${url}\n\nInvitation-only — there is no public sign-up.`,
+      `You have been invited to join ${tenantName} on Lean.\n\nSign in with this email address to get started:\n${url}\n\nInvitation-only — there is no public sign-up.`,
   },
   otpMail: {
-    subject: "Your TreeOps sign-in code",
+    subject: "Your Lean sign-in code",
     body: (otp: string) =>
       `Your sign-in code is: ${otp}\n\nIt is valid for 10 minutes and can be used once.`,
   },

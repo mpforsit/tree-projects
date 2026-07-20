@@ -156,7 +156,7 @@ test.describe("as the instance admin (no memberships)", () => {
   test("manages tenants and domain claims but sees no tenant data (invariant 6)", async ({
     page,
   }) => {
-    await loginViaOtp(page, "admin@treeops.forsit.de");
+    await loginViaOtp(page, "admin@lean.forsit.de");
     await expect(page.getByText("no active memberships")).toBeVisible();
 
     await page.goto("/instance");

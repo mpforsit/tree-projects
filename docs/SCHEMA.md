@@ -1,4 +1,4 @@
-# TreeOps — Datenbankstruktur (Stand: Migrationen 0001–0028)
+# Lean — Datenbankstruktur (Stand: Migrationen 0001–0028)
 
 Aktuelles Schema der Postgres-Datenbank als Diagramm, jede Tabelle mit
 einer echten Beispielzeile aus dem Seed (`db/seed/seed.sql`, Tenant
@@ -212,7 +212,7 @@ erDiagram
 | id | email | display_name | is_instance_admin |
 |---|---|---|---|
 | `e0…0001` | mpiksa@forsit.de | Matthias B. | false |
-| `e0…0006` | admin@treeops.forsit.de | Instance Admin | **true** (keine Memberships → kein Datenzugriff, Invariante 6) |
+| `e0…0006` | admin@lean.forsit.de | Instance Admin | **true** (keine Memberships → kein Datenzugriff, Invariante 6) |
 
 ### member
 | id | tenant_id | user_id | is_tenant_admin | has_hr_rights | can_create_branches |

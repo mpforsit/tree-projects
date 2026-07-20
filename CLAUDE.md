@@ -1,10 +1,10 @@
-# CLAUDE.md — TreeOps
+# CLAUDE.md — Lean
 
 Project context for Claude Code. Read this first, then the reference documents below as needed.
 
 ## What this is
 
-TreeOps: **multi-tenant, self-hosted** hierarchical portfolio/project/task management. Several tenants (organizations) share one installation with hard data isolation. Per tenant: one tree of areas/projects/tasks (unlimited nesting), membership-scoped visibility, time-weighted progress rollup, an alarm system for stagnant/due work, and an append-only event log as the primary data structure. Deliberately minimal — a calm alternative to Jira. German-first UI, English login.
+Lean: **multi-tenant, self-hosted** hierarchical portfolio/project/task management. Several tenants (organizations) share one installation with hard data isolation. Per tenant: one tree of areas/projects/tasks (unlimited nesting), membership-scoped visibility, time-weighted progress rollup, an alarm system for stagnant/due work, and an append-only event log as the primary data structure. Deliberately minimal — a calm alternative to Jira. German-first UI, English login.
 
 ## Reference documents (precedence: top wins on conflict)
 
