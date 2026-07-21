@@ -1,0 +1,290 @@
+openapi: 3.0.3
+info:
+  title: TreeOps Crawler API
+  version: 1.0.0
+  description: >
+    Read-only API consumed by the canri crawler. Every endpoint requires a
+    bearer API token (see db/migrations/0029, scripts/mint-api-token.ts). A
+    token resolves to a service member of one tenant; responses are scoped to
+    that tenant by row-level security.
+
+    Incremental sync: /tasks and /time-logs are keyset-paginated by the
+    append-only event log's monotonic id. Poll with `since` = the last
+    `next_cursor` you received; an empty page echoes your cursor back.
+
+    Cursors and event ids are 64-bit integers serialized as decimal strings
+    so precision never depends on a JSON number range.
+servers:
+  - url: /api/v1
+security:
+  - bearerAuth: []
+paths:
+  /tasks:
+    get:
+      operationId: listTasks
+      summary: Task snapshots and deletion tombstones changed since a cursor
+      parameters:
+        - $ref: "#/components/parameters/Since"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: A keyset page of tasks.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskPage"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /time-logs:
+    get:
+      operationId: listTimeLogs
+      summary: Time logs added or corrected since a cursor
+      parameters:
+        - $ref: "#/components/parameters/Since"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: A keyset page of time logs.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TimeLogPage"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /projects:
+    get:
+      operationId: listProjects
+      summary: Project nodes visible to the token (config-time)
+      responses:
+        "200":
+          description: All visible project nodes.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjectList"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /members:
+    get:
+      operationId: listMembers
+      summary: Members of the token's tenant (config-time)
+      responses:
+        "200":
+          description: All members of the tenant.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MemberList"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /whoami:
+    get:
+      operationId: whoami
+      summary: Validate the token and echo its identity
+      responses:
+        "200":
+          description: The tenant and service member the token acts as.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WhoAmI"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  parameters:
+    Since:
+      name: since
+      in: query
+      required: false
+      description: Event-id cursor; return rows changed after it. Default "0".
+      schema:
+        type: string
+        pattern: "^[0-9]+$"
+        default: "0"
+    Limit:
+      name: limit
+      in: query
+      required: false
+      description: Max rows per page (1..1000).
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 1000
+        default: 500
+  responses:
+    BadRequest:
+      description: Invalid query parameter.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    Unauthorized:
+      description: Missing, malformed, unknown, or revoked bearer token.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+  schemas:
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+    Task:
+      type: object
+      required: [event_id, task_id, title, deleted]
+      properties:
+        event_id:
+          type: string
+          description: Cursor position of this row (decimal bigint).
+        task_id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        status:
+          type: string
+          nullable: true
+          enum: [open, in_progress, blocked, done]
+        percent:
+          type: integer
+          nullable: true
+        responsible_id:
+          type: string
+          format: uuid
+          nullable: true
+        due_date:
+          type: string
+          format: date
+          nullable: true
+        archived_at:
+          type: string
+          format: date-time
+          nullable: true
+        deleted:
+          type: boolean
+          description: True for a deletion tombstone (the node no longer exists).
+        project_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Nearest project ancestor, or null if none.
+        project_title:
+          type: string
+          nullable: true
+        path:
+          type: string
+          nullable: true
+          description: ltree path of the task within its tenant.
+    TaskPage:
+      type: object
+      required: [data, next_cursor]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Task"
+        next_cursor:
+          type: string
+    TimeLog:
+      type: object
+      required: [event_id, time_log_id, task_id, member_id, member_email, date, minutes]
+      properties:
+        event_id:
+          type: string
+        time_log_id:
+          type: string
+          format: uuid
+        task_id:
+          type: string
+          format: uuid
+        member_id:
+          type: string
+          format: uuid
+        member_email:
+          type: string
+        date:
+          type: string
+          format: date
+        minutes:
+          type: integer
+        note:
+          type: string
+          nullable: true
+    TimeLogPage:
+      type: object
+      required: [data, next_cursor]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/TimeLog"
+        next_cursor:
+          type: string
+    Project:
+      type: object
+      required: [id, title, path]
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        path:
+          type: string
+        parent_id:
+          type: string
+          format: uuid
+          nullable: true
+        archived_at:
+          type: string
+          format: date-time
+          nullable: true
+    ProjectList:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Project"
+    Member:
+      type: object
+      required: [id, email, display_name]
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+        display_name:
+          type: string
+    MemberList:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Member"
+    WhoAmI:
+      type: object
+      required: [tenant_id, tenant_slug, member_id]
+      properties:
+        tenant_id:
+          type: string
+          format: uuid
+        tenant_slug:
+          type: string
+        member_id:
+          type: string
+          format: uuid

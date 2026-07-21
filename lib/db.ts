@@ -69,6 +69,25 @@ async function runInContext<T>(
   }
 }
 
+/**
+ * A single query with NO tenant context — for the rare read that must run
+ * before a context can exist. The only sanctioned use is API-token
+ * resolution (lib/api-auth.ts), which calls the SECURITY DEFINER
+ * resolve_api_token() to find the token's identity before withTenantContext
+ * can be opened. Never use this to touch RLS-governed domain rows directly.
+ */
+export async function queryNoContext<T extends pg.QueryResultRow>(
+  sql: string,
+  params: unknown[],
+): Promise<pg.QueryResult<T>> {
+  const client = await getPool().connect();
+  try {
+    return await client.query<T>(sql, params);
+  } finally {
+    client.release();
+  }
+}
+
 /** Liveness probe (Coolify healthcheck): app_user connection + trivial
  *  query — no tenant context, touches no domain rows. */
 export async function pingDb(): Promise<void> {

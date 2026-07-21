@@ -41,7 +41,9 @@ export type EventType =
   | "tenant.settings_changed"
   | "domain_claim.added"
   | "domain_claim.removed"
-  | "domain_claim.sso_enforced_changed";
+  | "domain_claim.sso_enforced_changed"
+  | "api_token.created"
+  | "api_token.revoked";
 
 export type EventSource = "ui" | "teams" | "slack" | "api" | "llm" | "system";
 
