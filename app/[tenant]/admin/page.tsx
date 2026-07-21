@@ -2,10 +2,12 @@ import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import {
   AllowlistForm,
+  ApiTokenManager,
   InviteForm,
   MemberTable,
   MoveTool,
   SettingsForm,
+  type ApiTokenRow,
   type MemberRow,
   type MoveOption,
 } from "@/components/admin-forms";
@@ -55,8 +57,16 @@ export default async function AdminPage({
                 entra_tenant_allowlist
          FROM tenant WHERE id = app_tenant_or_null()`,
       );
+      const { rows: apiTokens } = await client.query<ApiTokenRow>(
+        `SELECT id, name, token_prefix,
+                created_at::text AS created_at,
+                last_used_at::text AS last_used_at
+         FROM api_token
+         WHERE revoked_at IS NULL
+         ORDER BY created_at DESC`,
+      );
       const nodes = await fetchVisibleNodes(client);
-      return { members, settings: settings[0]!, nodes };
+      return { members, settings: settings[0]!, nodes, apiTokens };
     },
   );
   if (!data) notFound();
@@ -104,6 +114,11 @@ export default async function AdminPage({
       <section className="panel" style={card} data-testid="admin-move">
         <h2 className="section-label">{s.move}</h2>
         <MoveTool slug={slug} options={moveOptions} />
+      </section>
+
+      <section className="panel" style={card} data-testid="admin-api-tokens">
+        <h2 className="section-label">{s.apiTokens.title}</h2>
+        <ApiTokenManager slug={slug} tokens={data.apiTokens} />
       </section>
     </div>
   );

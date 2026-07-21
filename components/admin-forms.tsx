@@ -7,7 +7,9 @@
 import { useState } from "react";
 import {
   inviteMemberAction,
+  mintApiTokenAction,
   moveNodeAction,
+  revokeApiTokenAction,
   setEntraAllowlistAction,
   setMemberFlagAction,
   setTenantSettingsAction,
@@ -346,5 +348,125 @@ export function MoveTool({ slug, options }: { slug: string; options: MoveOption[
       </div>
       <ErrorNote error={error} />
     </form>
+  );
+}
+
+export interface ApiTokenRow {
+  id: string;
+  name: string;
+  token_prefix: string;
+  created_at: string;
+  last_used_at: string | null;
+}
+
+export function ApiTokenManager({
+  slug,
+  tokens,
+}: {
+  slug: string;
+  tokens: ApiTokenRow[];
+}) {
+  const [name, setName] = useState("");
+  const [minted, setMinted] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const t = s.apiTokens;
+
+  async function create(e: React.FormEvent) {
+    e.preventDefault();
+    setError(null);
+    setMinted(null);
+    setBusy(true);
+    const result = await mintApiTokenAction(slug, name);
+    setBusy(false);
+    if (result.error) {
+      setError(result.error);
+      return;
+    }
+    setMinted(result.token ?? null);
+    setName("");
+  }
+
+  async function revoke(id: string) {
+    if (!confirm(t.revokeConfirm)) return;
+    setError(null);
+    const result = await revokeApiTokenAction(slug, id);
+    if (result.error) setError(result.error);
+  }
+
+  return (
+    <div>
+      <p style={{ fontSize: 12.5, color: "var(--mut2)", margin: "0 0 8px" }}>{t.hint}</p>
+
+      <form onSubmit={create} style={{ display: "flex", gap: 8, alignItems: "center" }}>
+        <input
+          value={name}
+          aria-label={t.nameLabel}
+          placeholder={t.namePlaceholder}
+          onChange={(e) => setName(e.target.value)}
+          className="admin-input"
+          style={{ flex: 1 }}
+        />
+        <button type="submit" className="filter-chip active" disabled={busy}>
+          {t.create}
+        </button>
+      </form>
+
+      {minted && (
+        <div
+          style={{
+            marginTop: 10,
+            padding: 10,
+            border: "1px solid var(--border2)",
+            borderRadius: 8,
+            background: "var(--surface2)",
+          }}
+        >
+          <p style={{ fontSize: 12.5, margin: "0 0 6px", color: "var(--teal)" }}>{t.shownOnce}</p>
+          <code style={{ wordBreak: "break-all", fontSize: 12.5 }}>{minted}</code>
+        </div>
+      )}
+
+      <ErrorNote error={error} />
+
+      {tokens.length === 0 ? (
+        <p style={{ fontSize: 12.5, color: "var(--mut2)", marginTop: 12 }}>{t.empty}</p>
+      ) : (
+        <table style={{ width: "100%", marginTop: 12, fontSize: 12.5, borderCollapse: "collapse" }}>
+          <thead>
+            <tr style={{ textAlign: "left", color: "var(--mut2)" }}>
+              <th style={{ padding: "4px 6px" }}>{t.colName}</th>
+              <th style={{ padding: "4px 6px" }}>{t.colPrefix}</th>
+              <th style={{ padding: "4px 6px" }}>{t.colCreated}</th>
+              <th style={{ padding: "4px 6px" }}>{t.colLastUsed}</th>
+              <th />
+            </tr>
+          </thead>
+          <tbody>
+            {tokens.map((token) => (
+              <tr key={token.id} style={{ borderTop: "1px solid var(--border2)" }}>
+                <td style={{ padding: "4px 6px" }}>{token.name}</td>
+                <td style={{ padding: "4px 6px" }}>
+                  <code>{token.token_prefix}…</code>
+                </td>
+                <td style={{ padding: "4px 6px" }}>{token.created_at.slice(0, 10)}</td>
+                <td style={{ padding: "4px 6px" }}>
+                  {token.last_used_at ? token.last_used_at.slice(0, 10) : t.never}
+                </td>
+                <td style={{ padding: "4px 6px", textAlign: "right" }}>
+                  <button
+                    type="button"
+                    className="filter-chip"
+                    onClick={() => revoke(token.id)}
+                  >
+                    {t.revoke}
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
   );
 }

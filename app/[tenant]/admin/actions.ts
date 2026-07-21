@@ -5,12 +5,15 @@
  * live inside the SECURITY DEFINER functions (§7) — these actions only
  * resolve the context and relay errors.
  */
+import { createHash, randomBytes } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { resolveContext } from "@/app/[tenant]/actions";
 import { withTenantContext } from "@/lib/db";
 import {
   inviteMember,
+  mintApiToken,
   moveNode,
+  revokeApiToken,
   setEntraAllowlist,
   setMemberFlag,
   setTenantSettings,
@@ -111,5 +114,42 @@ export async function moveNodeAction(
     return { error: err instanceof Error ? err.message : "Fehler" };
   }
   revalidatePath(`/${slug}`, "layout");
+  return {};
+}
+
+/**
+ * Mint an API token for the canri crawler. The plaintext is generated here
+ * and returned exactly once; only its sha256 reaches the database.
+ */
+export async function mintApiTokenAction(
+  slug: string,
+  name: string,
+): Promise<{ token?: string; error?: string }> {
+  const ctx = await resolveContext(slug);
+  const secret = `treeops_${randomBytes(32).toString("base64url")}`;
+  const hash = createHash("sha256").update(secret).digest();
+  const prefix = secret.slice(0, "treeops_".length + 4);
+  try {
+    await withTenantContext(ctx, (client) =>
+      mintApiToken(client, { name: name.trim() || "canri crawler", hash, prefix }),
+    );
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "Fehler" };
+  }
+  revalidatePath(`/${slug}/admin`);
+  return { token: secret };
+}
+
+export async function revokeApiTokenAction(
+  slug: string,
+  apiTokenId: string,
+): Promise<{ error?: string }> {
+  const ctx = await resolveContext(slug);
+  try {
+    await withTenantContext(ctx, (client) => revokeApiToken(client, apiTokenId));
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "Fehler" };
+  }
+  revalidatePath(`/${slug}/admin`);
   return {};
 }
