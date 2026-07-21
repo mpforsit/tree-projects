@@ -535,3 +535,34 @@ konsistent mitgezogen).
 - Tag `v1.0.0-phase1` (lokal, nicht gepusht) und der Coolify-Projektname
   auf dem Server bleiben unverändert — Umbenennen dort ist eine separate
   Ops-/Hosting-Aktion, keine Code-Änderung.
+
+---
+
+## 2026-07-21 — Fix: /instance-Dropdowns nach Tenant-Anlage veraltet
+
+**Done:** Bug beim Produktions-Bring-up entdeckt (vom Owner gemeldet): Nach
+„Create Tenant" tauchte der neue Tenant NICHT in den Dropdowns „Appoint
+Tenant Admin" und „Domain Claims" auf — erst ein manueller Reload half.
+Ursache: Die Client-Formulare in `components/instance-forms.tsx` rufen die
+Server-Actions imperativ auf (`await createTenantAction(...)` im onSubmit)
+und verließen sich allein auf `revalidatePath("/instance")`; das
+invalidiert den Server-Cache, löst bei imperativer Aufrufform aber kein
+Neu-Rendern der aktuellen Client-Ansicht aus, sodass die server-gerenderten
+`tenants`-Props der Geschwister-Formulare veraltet blieben.
+
+Fix: `router.refresh()` (next/navigation) nach erfolgreicher Mutation in
+`CreateTenantForm.submit` sowie in `DomainClaims` (claim/release/toggleSso —
+identische Ursache, sonst erschiene ein neuer Claim ebenfalls erst nach
+Reload). `AppointAdminForm` bewusst unangetastet: rendert keine Liste, die
+refresht werden müsste.
+
+**Files:** `components/instance-forms.tsx`.
+
+**Verify:** `tsc --noEmit` clean. Reine Client-UI-Änderung ohne DB-/RLS-
+Bezug; kein SQL/Unit-Test betroffen. E2E (admin.spec) nicht in dieser
+Session gefahren (Prod-Ops-Kontext, kein Browser-Lauf) — Änderung ist
+minimal und typgeprüft.
+
+**Caveats:** Der Owner hat sich in Prod bereits per Reload beholfen; der
+Fix beseitigt den Reload-Zwang für künftige Anlagen. Greift nach dem
+nächsten Prod-Deploy von `main`.

@@ -1,6 +1,7 @@
 "use client";
 
 /** Client pieces of /instance (English by design, §15.1). */
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import {
   appointAdminAction,
@@ -36,6 +37,7 @@ function Feedback({ note, error }: { note: string | null; error: string | null }
 }
 
 export function CreateTenantForm() {
+  const router = useRouter();
   const [slug, setSlug] = useState("");
   const [name, setName] = useState("");
   const [note, setNote] = useState<string | null>(null);
@@ -53,6 +55,10 @@ export function CreateTenantForm() {
     setNote(s.created(slug));
     setSlug("");
     setName("");
+    // Refresh so the new tenant reaches the sibling dropdowns (appoint
+    // admin, domain claims) — revalidatePath alone doesn't re-render the
+    // current client view for imperatively-invoked actions.
+    router.refresh();
   }
 
   return (
@@ -156,6 +162,7 @@ export function DomainClaims({
   claims: DomainRow[];
   tenants: TenantOption[];
 }) {
+  const router = useRouter();
   const [domain, setDomain] = useState("");
   const [tenantId, setTenantId] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -171,18 +178,21 @@ export function DomainClaims({
       return;
     }
     setDomain("");
+    router.refresh();
   }
 
   async function toggleSso(row: DomainRow, enforced: boolean) {
     setError(null);
     const result = await setDomainSsoAction(row.domain, enforced);
     if (result.error) setError(result.error);
+    else router.refresh();
   }
 
   async function release(row: DomainRow) {
     setError(null);
     const result = await releaseDomainAction(row.domain);
     if (result.error) setError(result.error);
+    else router.refresh();
   }
 
   return (
