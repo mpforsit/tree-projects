@@ -566,3 +566,40 @@ minimal und typgeprüft.
 **Caveats:** Der Owner hat sich in Prod bereits per Reload beholfen; der
 Fix beseitigt den Reload-Zwang für künftige Anlagen. Greift nach dem
 nächsten Prod-Deploy von `main`.
+
+---
+
+## 2026-07-21 — Fix: Root-Bereich in der UI anlegbar (Glance)
+
+**Done:** Zweite Lücke beim Prod-Bring-up (Owner gemeldet): Auf einem frischen
+Tenant kann ein Tenant-Admin keinen Root-Bereich anlegen — die Glance-Seite
+rendert keine Anlege-Schaltfläche, und die Kette dahin war typseitig auf
+Kinder-Knoten verengt. Das Backend konnte es längst
+(`create_node(NULL,'area',…)`, tenant-admin-only, SQL-erzwungen; in
+mutations.test.ts abgedeckt) — nur die UI-Verdrahtung fehlte.
+
+Fix (reine UI/Wiring, kein Migrations-/RLS-Bezug):
+- `createNodeAction` (app/[tenant]/actions.ts): Typ auf
+  `"task"|"project"|"area"` und `parentId: string | null` geweitet
+  (reicht `parentId` nullable an das bereits nullable `createNode` durch).
+- `NewNodeButton` (components/new-node.tsx): akzeptiert `parentId: string|null`
+  und `type: …|"area"`; Platzhalter je Typ; `router.refresh()` nach Erfolg
+  (konsistent mit dem /instance-Fix, damit die neue Karte ohne Reload
+  erscheint — betrifft auch Task/Teilbereich-Anlage in der Branch-View).
+- Glance-Seite (app/[tenant]/page.tsx): lädt den Viewer; für Tenant-Admins
+  „+ Bereich“-Button neben der Überschrift; Empty-State, wenn keine Karten
+  (mit Admin-Hinweis auf den Button).
+- Strings: glance.newArea / newAreaTitle / empty / emptyAdminHint.
+
+**Files:** app/[tenant]/actions.ts, app/[tenant]/page.tsx,
+components/new-node.tsx, lib/strings.ts.
+
+**Verify:** `tsc --noEmit` clean; mutations-Unit-Suite 28/28 grün (deckt den
+Backend-Pfad create_node(NULL,'area') erlaubt/verweigert ab). Browser-Flow
+in dieser Session NICHT gefahren (Prod-Ops-Kontext, OTP-Login-Setup für E2E
+zu schwer) — die Änderung ist dünne Verdrahtung einer test-gedeckten
+Backend-Fähigkeit und typgeprüft.
+
+**Caveats:** Greift erst nach dem nächsten Prod-Deploy von `main`. Root-
+Bereichsanlage bleibt tenant-admin-only (Backend erzwingt das; der Button
+wird nur Tenant-Admins gerendert — §15.2 „hidden, not grayed“).

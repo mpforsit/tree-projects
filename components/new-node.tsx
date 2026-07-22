@@ -3,6 +3,7 @@
 /** Inline creation affordances: "+ Aufgabe" for members, "+ Teilbereich"
  *  only rendered when the server decided the viewer may (§15.2: hidden,
  *  not grayed — the flag is org policy). */
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createNodeAction } from "@/app/[tenant]/actions";
 import { strings } from "@/lib/strings";
@@ -15,11 +16,12 @@ export function NewNodeButton({
   quiet,
 }: {
   slug: string;
-  parentId: string;
-  type: "task" | "project";
+  parentId: string | null;
+  type: "task" | "project" | "area";
   label: string;
   quiet?: boolean;
 }) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -35,7 +37,15 @@ export function NewNodeButton({
     setTitle("");
     setOpen(false);
     setError(null);
+    router.refresh();
   }
+
+  const placeholder =
+    type === "task"
+      ? strings.branch.newTaskTitle
+      : type === "area"
+        ? strings.glance.newAreaTitle
+        : strings.branch.newBranchTitle;
 
   if (!open) {
     return (
@@ -60,9 +70,7 @@ export function NewNodeButton({
         autoFocus
         value={title}
         onChange={(e) => setTitle(e.target.value)}
-        placeholder={
-          type === "task" ? strings.branch.newTaskTitle : strings.branch.newBranchTitle
-        }
+        placeholder={placeholder}
         style={{
           padding: "5px 9px",
           borderRadius: 7,

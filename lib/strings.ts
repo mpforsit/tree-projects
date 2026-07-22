@@ -58,6 +58,10 @@ export const strings = {
     },
     legend: "Fortschritt · Blockiert · Alarm",
     sizeToggle: "Kartengröße umschalten",
+    newArea: "+ Bereich",
+    newAreaTitle: "Name des neuen Bereichs",
+    empty: "Noch keine Bereiche.",
+    emptyAdminHint: "Lege oben mit „+ Bereich“ den ersten Bereich an.",
   },
   status: {
     open: "offen",

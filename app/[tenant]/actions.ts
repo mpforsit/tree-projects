@@ -149,8 +149,8 @@ export async function configureBranchAlarmsAction(
 
 export async function createNodeAction(
   slug: string,
-  parentId: string,
-  type: "task" | "project",
+  parentId: string | null,
+  type: "task" | "project" | "area",
   title: string,
 ): Promise<{ error?: string }> {
   const ctx = await resolveContext(slug);

@@ -1,12 +1,14 @@
 import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { GlanceCard, type GlanceCardData } from "@/components/glance-card";
+import { NewNodeButton } from "@/components/new-node";
 import { ZoomIn } from "@/components/zoom-in";
 import { getSessionUser } from "@/lib/auth";
 import { withTenantContext } from "@/lib/db";
 import { strings } from "@/lib/strings";
 import { userTenants } from "@/lib/tenants";
 import {
+  fetchViewer,
   fetchVisibleNodes,
   isDescendant,
   subtreeTaskCount,
@@ -33,14 +35,15 @@ export default async function GlancePage({
   const tenant = (await userTenants(user.id)).find((t) => t.slug === slug);
   if (!tenant) notFound();
 
-  const { nodes, sizes } = await withTenantContext(
+  const { nodes, sizes, viewer } = await withTenantContext(
     { userId: user.id, tenantId: tenant.id },
     async (client) => {
       const nodes = await fetchVisibleNodes(client);
+      const viewer = await fetchViewer(client);
       const { rows } = await client.query<{ value: Record<string, string> }>(
         `SELECT value FROM user_preference WHERE key = 'glance.cardSizes'`,
       );
-      return { nodes, sizes: rows[0]?.value ?? {} };
+      return { nodes, sizes: rows[0]?.value ?? {}, viewer };
     },
   );
 
@@ -105,14 +108,31 @@ export default async function GlancePage({
           marginBottom: 16,
         }}
       >
-        <h1 style={{ fontSize: 22, margin: 0 }}>{strings.glance.branches}</h1>
+        <div style={{ display: "flex", alignItems: "baseline", gap: 14 }}>
+          <h1 style={{ fontSize: 22, margin: 0 }}>{strings.glance.branches}</h1>
+          {viewer?.is_tenant_admin && (
+            <NewNodeButton
+              slug={slug}
+              parentId={null}
+              type="area"
+              label={strings.glance.newArea}
+            />
+          )}
+        </div>
         <span style={{ fontSize: 11, color: "var(--faint)" }}>{strings.glance.legend}</span>
       </div>
-      <div className="glance-grid">
-        {cards.map((card) => (
-          <GlanceCard key={card.id} slug={slug} card={card} />
-        ))}
-      </div>
+      {cards.length === 0 ? (
+        <p style={{ color: "var(--mut)", fontSize: 13.5 }}>
+          {strings.glance.empty}
+          {viewer?.is_tenant_admin ? ` ${strings.glance.emptyAdminHint}` : ""}
+        </p>
+      ) : (
+        <div className="glance-grid">
+          {cards.map((card) => (
+            <GlanceCard key={card.id} slug={slug} card={card} />
+          ))}
+        </div>
+      )}
     </ZoomIn>
   );
 }
