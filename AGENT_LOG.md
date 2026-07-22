@@ -676,3 +676,39 @@ schaltet die Zweig-Option live frei/aus.
 **Caveats:** Reine UI/Strings-Änderung, kein Datenmodell/Migration. Greift
 nach dem nächsten Prod-Deploy von `main`. Kein Node-Delete/Umbenennen-UI
 (bestehende Lücke, separat).
+
+---
+
+## 2026-07-22 — Logos in der Anwendung verdrahtet
+
+**Was:** Das Logo-Paket unter `public/logos/` in die App eingebunden —
+Favicons/Manifest/OG-Bild global sowie die textuelle „Lean"-Wortmarke an allen
+UI-Stellen durch das echte Logo ersetzt.
+
+**Dateien:**
+- `components/logo.tsx` (neu) — wiederverwendbare, theme-aware `Logo`-Komponente
+  (Varianten horizontal/mark/stacked; rendert Light- + White-Artwork, Umschaltung
+  per CSS ohne Flash). Läuft in Server- und Client-Komponenten (keine Hooks).
+- `app/globals.css` — CSS-Regeln `.lean-logo-light/-dark` für den Theme-Wechsel
+  über `body[data-theme="dark"]`.
+- `app/layout.tsx` — `metadata.icons`/`manifest`/`openGraph.images` + `viewport.themeColor`
+  (Metadata-API), verweisen auf `/logos/favicon/*` bzw. `/logos/png/*`.
+- `public/logos/favicon/site.webmanifest` — Icon-`src`-Pfade von Root auf
+  `/logos/favicon/*` korrigiert (Dateien liegen nicht im Public-Root).
+- `components/login-form.tsx`, `app/[tenant]/layout.tsx`, `app/no-access/page.tsx`,
+  `app/select/page.tsx` — Text „Lean" → `<Logo variant="horizontal">` (Select-Seite
+  hatte bisher gar kein Branding).
+
+**Begründung:** Dateien wurden dort belassen, wo sie abgelegt wurden
+(`public/logos/…`), statt in den Public-Root zu verschieben — daher Referenzen auf
+`/logos/…` und Korrektur der Manifest-Pfade (minimalinvasiv). Eine zentrale
+`Logo`-Komponente statt verstreuter `<img>`-Tags folgt dem Ein-Ort-Prinzip.
+SVG-`<img>` statt `next/image` (Codebase nutzt kein `next/image`; SVGs werden
+ohnehin nicht optimiert).
+
+**Caveat / offene Design-Frage:** Die Logo-Farben sind kühl (Blau `#2563eb`,
+Anthrazit `#0f172a`), die App-Tokens hingegen warm (Creme/Anthrazit, `--blue #2f6098`).
+Das Blau des Lockups sticht dadurch leicht aus dem Chrome heraus. Falls das stören
+sollte: entweder die `-mono`-Varianten verwenden oder die Tokens ans Markenblau
+angleichen. `viewport.themeColor` steht bewusst auf dem Markenwert `#0f172a`
+(betrifft nur die mobile Browser-Leiste).

@@ -85,6 +85,18 @@ a {
   text-decoration: none;
 }
 
+/* Logo artwork swap: light variant by default, white variant on dark
+   theme (components/logo.tsx renders both). */
+.lean-logo-dark {
+  display: none;
+}
+body[data-theme="dark"] .lean-logo-light {
+  display: none;
+}
+body[data-theme="dark"] .lean-logo-dark {
+  display: block;
+}
+
 button {
   font: inherit;
   cursor: pointer;

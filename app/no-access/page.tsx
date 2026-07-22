@@ -1,3 +1,4 @@
+import { Logo } from "@/components/logo";
 import { strings } from "@/lib/strings";
 
 /** Friendly dead end for zero memberships (spec §8.3). */
@@ -15,9 +16,7 @@ export default function NoAccess() {
         color: "var(--mut)",
       }}
     >
-      <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 14, color: "var(--ink)" }}>
-        Lean
-      </div>
+      <Logo variant="horizontal" height={28} style={{ marginBottom: 14 }} />
       {strings.login.noMemberships}
     </div>
   );

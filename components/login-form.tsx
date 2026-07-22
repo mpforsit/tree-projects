@@ -8,6 +8,7 @@
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
+import { Logo } from "@/components/logo";
 import { strings } from "@/lib/strings";
 
 const s = strings.login;
@@ -106,7 +107,7 @@ export function LoginForm({ entra }: { entra: boolean }) {
 
   return (
     <div style={panel}>
-      <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 18 }}>Lean</div>
+      <Logo variant="horizontal" height={30} style={{ marginBottom: 18 }} />
 
       {step === "email" && (
         <form
