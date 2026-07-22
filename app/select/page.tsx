@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getSessionUser } from "@/lib/auth";
 import { userTenants } from "@/lib/tenants";
+import { Logo } from "@/components/logo";
 import { strings } from "@/lib/strings";
 
 /** Tenant picker for users with several memberships (spec §8.3). */
@@ -23,6 +24,7 @@ export default async function SelectTenant() {
         padding: "32px 28px",
       }}
     >
+      <Logo variant="horizontal" height={28} style={{ marginBottom: 18 }} />
       <h1 style={{ fontSize: 22, margin: "0 0 16px" }}>{strings.login.pickTenant}</h1>
       <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
         {tenants.map((t) => (

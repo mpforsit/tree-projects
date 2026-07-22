@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { AvatarMenu } from "@/components/avatar-menu";
 import { SearchBox } from "@/components/search-box";
+import { Logo } from "@/components/logo";
 import { getSessionUser } from "@/lib/auth";
 import { withTenantContext } from "@/lib/db";
 import { strings } from "@/lib/strings";
@@ -46,11 +47,8 @@ export default async function TenantLayout({
           borderBottom: "1px solid var(--border)",
         }}
       >
-        <Link
-          href={`/${active.slug}`}
-          style={{ fontWeight: 700, fontSize: 14.5, color: "var(--ink)" }}
-        >
-          Lean
+        <Link href={`/${active.slug}`} style={{ display: "inline-flex" }}>
+          <Logo variant="horizontal" height={24} />
         </Link>
         <span data-testid="tenant-name" style={{ fontSize: 12.5, color: "var(--mut)" }}>
           {active.name}
