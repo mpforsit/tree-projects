@@ -114,8 +114,8 @@ export default async function GlancePage({
             <NewNodeButton
               slug={slug}
               parentId={null}
-              type="area"
-              label={strings.glance.newArea}
+              types={["area", "project"]}
+              label={strings.create.new}
             />
           )}
         </div>

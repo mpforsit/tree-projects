@@ -36,13 +36,15 @@ test.describe("as MB (tenant admin)", () => {
     await jtPage.goto(`/forsit/b/${B.nordhof}`);
     await expect(async () => {
       await jtPage.reload();
-      await expect(jtPage.getByTestId("new-project")).toBeVisible({ timeout: 1_000 });
+      await jtPage.getByTestId("new-node").click();
+      await expect(jtPage.getByTestId("create-type-project")).toBeVisible({ timeout: 1_000 });
     }).toPass();
 
     await jtFlag.uncheck();
     await expect(async () => {
       await jtPage.reload();
-      await expect(jtPage.getByTestId("new-project")).not.toBeVisible({ timeout: 1_000 });
+      await jtPage.getByTestId("new-node").click();
+      await expect(jtPage.getByTestId("create-type-project")).toHaveCount(0, { timeout: 1_000 });
     }).toPass();
     await jt.close();
   });

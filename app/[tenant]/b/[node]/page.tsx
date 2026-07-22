@@ -184,8 +184,8 @@ export default async function BranchPage({
           <NewNodeButton
             slug={slug}
             parentId={branch.id}
-            type="task"
-            label={strings.branch.firstTask}
+            types={canCreateBranches ? ["area", "project", "task"] : ["task"]}
+            label={strings.create.firstNode}
             quiet
           />
         </div>
@@ -254,17 +254,9 @@ export default async function BranchPage({
               <NewNodeButton
                 slug={slug}
                 parentId={branch.id}
-                type="task"
-                label={strings.branch.newTask}
+                types={canCreateBranches ? ["area", "project", "task"] : ["task"]}
+                label={strings.create.new}
               />
-              {canCreateBranches && (
-                <NewNodeButton
-                  slug={slug}
-                  parentId={branch.id}
-                  type="project"
-                  label={strings.branch.newBranch}
-                />
-              )}
             </div>
             <TaskList slug={slug} tasks={tasks} />
           </section>

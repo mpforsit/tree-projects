@@ -637,3 +637,42 @@ Pre-Deployment). Der VOR dem Fix angelegte Root-Bereich in Prod bleibt
 ohne Membership → unsichtbar; entweder nach Redeploy neu anlegen, oder dem
 Ersteller per einmaligem `grant_membership`/SQL eine branch_admin-Membership
 darauf geben. Kein Node-Delete-UI vorhanden (separate, spätere Lücke).
+
+---
+
+## 2026-07-21 — Bereich/Projekt: Nutzer wählt den Typ + Verschachtelungs-Lücke behoben
+
+**Done:** Owner-Design-Entscheidung nach Diskussion: area vs project ist
+funktional identisch (Spec §2.1, im Code bestätigt — jede Verzweigung prüft
+nur task/non-task), feste Ebenen werden NICHT erzwungen. Stattdessen wählt
+der Nutzer beim Anlegen selbst den Typ.
+
+- `NewNodeButton` von festem `type` auf `types: CreateType[]` umgestellt:
+  ein „+ Neu“-Button; bei >1 erlaubtem Typ zeigt das offene Formular einen
+  Typ-Umschalter (Bereich/Projekt/Aufgabe). Test-IDs: `new-node`,
+  `create-type-{area|project|task}`. `router.refresh()` nach Erfolg.
+- Glance (Tenant-Admin): Wurzel-Anlage bietet [Bereich, Projekt].
+- Branch-View: EIN Button mit [Bereich, Projekt, Aufgabe] (bzw. nur
+  [Aufgabe] ohne can_create_branches) statt zwei getrennter Buttons.
+- **Verschachtelungs-Lücke behoben:** der Empty-State eines Bereichs bot
+  bisher nur „+ Erste Aufgabe“ (kein Zweig) — jetzt kontextabhängig auch
+  Bereich/Projekt, sodass Verschachtelung aus einem frischen Bereich
+  funktioniert (dieselbe Klasse wie die Glance-/instance-Empty-States).
+- Strings: neue `create`-Gruppe; verwaiste `branch.{firstTask,newTask,
+  newBranch,newTaskTitle,newBranchTitle,create}` und `glance.{newArea,
+  newAreaTitle}` entfernt; `glance.emptyAdminHint` aktualisiert.
+
+**Files:** components/new-node.tsx, app/[tenant]/page.tsx,
+app/[tenant]/b/[node]/page.tsx, lib/strings.ts, tests/e2e/views.spec.ts,
+tests/e2e/admin.spec.ts.
+
+**Verify:** `tsc --noEmit` clean (fängt entfernte String-Keys ab);
+111/111 Unit grün; **e2e im echten Browser gefahren** (vorinstalliertes
+Chromium, Dev-Server): views.spec 12/12 und admin.spec 12/12 grün — inkl.
+neuer Assertions „flag-loser Member sieht keine Zweig-Option“, „Tenant-Admin
+kann Bereich/Projekt/Aufgabe wählen“, Empty-State-Label, und JT-Flag-Toggle
+schaltet die Zweig-Option live frei/aus.
+
+**Caveats:** Reine UI/Strings-Änderung, kein Datenmodell/Migration. Greift
+nach dem nächsten Prod-Deploy von `main`. Kein Node-Delete/Umbenennen-UI
+(bestehende Lücke, separat).

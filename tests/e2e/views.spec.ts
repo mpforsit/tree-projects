@@ -37,10 +37,13 @@ test.describe("as MS (member, not responsible for t1)", () => {
 test.describe("as JT (no can_create_branches)", () => {
   test.use({ storageState: authState("jt") });
 
-  test("flag-less member gets no '+ Teilbereich' (hidden, not grayed)", async ({ page }) => {
+  test("flag-less member gets no branch type option (hidden, not grayed)", async ({ page }) => {
     await page.goto(`/forsit/b/${B.nordhof}`);
-    await expect(page.getByTestId("new-task")).toBeVisible();
-    await expect(page.getByTestId("new-project")).toHaveCount(0);
+    await page.getByTestId("new-node").click();
+    // Only tasks are offered → no type chooser at all, just a task title.
+    await expect(page.getByTestId("create-type-project")).toHaveCount(0);
+    await expect(page.getByTestId("create-type-area")).toHaveCount(0);
+    await expect(page.getByLabel("Titel der neuen Aufgabe")).toBeVisible();
   });
 });
 
@@ -64,9 +67,12 @@ test.describe("as AD (member of mywell + beratung)", () => {
 test.describe("as MB (tenant admin)", () => {
   test.use({ storageState: authState("mb") });
 
-  test("tenant admin sees '+ Teilbereich'", async ({ page }) => {
+  test("tenant admin can pick Bereich/Projekt when creating", async ({ page }) => {
     await page.goto(`/forsit/b/${B.nordhof}`);
-    await expect(page.getByTestId("new-project")).toBeVisible();
+    await page.getByTestId("new-node").click();
+    await expect(page.getByTestId("create-type-area")).toBeVisible();
+    await expect(page.getByTestId("create-type-project")).toBeVisible();
+    await expect(page.getByTestId("create-type-task")).toBeVisible();
   });
 
   test("percent click flips the chip to 'in Arbeit' and updates the branch header (rollup round-trip)", async ({
@@ -90,7 +96,7 @@ test.describe("as MB (tenant admin)", () => {
     await page.goto(`/forsit/b/${B.neuland}`);
     await expect(page.getByTestId("branch-percent")).toHaveText("—");
     await expect(page.getByTestId("empty-branch")).toContainText("Noch nichts hier…");
-    await expect(page.getByTestId("empty-branch")).toContainText("+ Erste Aufgabe anlegen");
+    await expect(page.getByTestId("empty-branch")).toContainText("+ Erstes Element anlegen");
   });
 });
 
