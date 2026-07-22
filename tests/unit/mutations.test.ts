@@ -82,6 +82,20 @@ describe("create_node", () => {
         [rows[0]!.id],
       );
       expect(node[0]).toEqual({ parent_id: null, depth: 1 });
+      // The creator becomes branch_admin so the new root is visible to
+      // them (§5, membership-based visibility) — 0029.
+      const { rows: ms } = await client.query<{ role: string }>(
+        `SELECT ms.role FROM membership ms
+         JOIN member m ON m.id = ms.member_id
+         WHERE m.user_id = app_user_or_null() AND ms.node_id = $1`,
+        [rows[0]!.id],
+      );
+      expect(ms[0]?.role).toBe("branch_admin");
+      const { rows: vis } = await client.query<{ id: string }>(
+        "SELECT id FROM visible_nodes WHERE id = $1 AND NOT skeleton",
+        [rows[0]!.id],
+      );
+      expect(vis).toHaveLength(1);
     });
   });
 });

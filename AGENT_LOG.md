@@ -603,3 +603,37 @@ Backend-Fähigkeit und typgeprüft.
 **Caveats:** Greift erst nach dem nächsten Prod-Deploy von `main`. Root-
 Bereichsanlage bleibt tenant-admin-only (Backend erzwingt das; der Button
 wird nur Tenant-Admins gerendert — §15.2 „hidden, not grayed“).
+
+---
+
+## 2026-07-21 — Fix: Root-Bereich war für Ersteller unsichtbar (Migration 0029)
+
+**Done:** Owner meldete beim Prod-Bring-up: „+ Bereich" angelegt, aber
+„es passiert nichts" — Glance blieb leer. Ursache (im Code verifiziert):
+`appoint_tenant_admin` (0013) setzt nur `is_tenant_admin`, legt KEINE
+`membership`-Zeile an; `create_node` (0009) legt bei Root-Anlage ebenfalls
+keine an. Da Sichtbarkeit strikt membership-basiert ist (§5, auch für
+Tenant-Admins, DECISIONS 2026-07-14), war der neue Root-Bereich real
+angelegt, aber für seinen Ersteller unsichtbar — Bootstrap-Sackgasse auf
+einem frischen Tenant.
+
+Fix: Migration **0029** ersetzt `create_node` (CREATE OR REPLACE, Rest
+verbatim aus 0009): Bei Root-Anlage (p_parent_id IS NULL) wird der Ersteller
+`branch_admin` des neuen Zweigs + `membership.granted`-Event. Spiegelt den
+Seed (Wurzel-Ersteller MB = branch_admin) und lässt Membership den einzigen
+Sichtbarkeitsmechanismus (kein dritter Weg). Sub-Zweige/Aufgaben unverändert
+(dort erbt der Ersteller Sicht über die Eltern-Membership).
+
+**Files:** db/migrations/0029_root_branch_grants_creator.sql (neu),
+tests/unit/mutations.test.ts (Assertion: Ersteller ist branch_admin +
+Root in visible_nodes sichtbar), docs/DECISIONS.md.
+
+**Verify:** `tsc --noEmit` clean; 111/111 Unit grün (inkl. erweitertem
+create_node-Test); alle 4 SQL-Suiten (m1/m3/m7/m9) grün auf frischem
+migrate+seed inkl. 0029.
+
+**Caveats:** Greift nach dem nächsten Prod-Deploy (Migration läuft im
+Pre-Deployment). Der VOR dem Fix angelegte Root-Bereich in Prod bleibt
+ohne Membership → unsichtbar; entweder nach Redeploy neu anlegen, oder dem
+Ersteller per einmaligem `grant_membership`/SQL eine branch_admin-Membership
+darauf geben. Kein Node-Delete-UI vorhanden (separate, spätere Lücke).
