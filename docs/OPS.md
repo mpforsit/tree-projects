@@ -108,15 +108,28 @@ Custom-Format (`.dmp`).
 | Datum | Umgebung | Dauer (RTO) | Ergebnis |
 |---|---|---|---|
 | 2026-07-17 | staging | ~0,65 s | bestanden — pg_restore des `.dmp` in Scratch-DB; 2 Tenants, voller Baum, 88 Events wiederhergestellt |
+| 2026-07-22 | production | ~0,44 s | bestanden — pg_restore in Scratch-DB; 1 Tenant (forsit), 2 Nodes wiederhergestellt |
 
 ## 2. Coolify-Projekt `lean-production`
 
-Wie Staging (1.1–1.3, 1.5, 1.6) mit eigener Datenbank, eigenen
+Läuft unter `https://lean.forsit.de` (PostgreSQL 18, wie Staging).
+Eingerichtet wie Staging (1.1–1.3, 1.5, 1.6) mit eigener Datenbank, eigenen
 Passwörtern, eigenem `BETTER_AUTH_SECRET` — und **ohne 1.4**: kein Seed,
 niemals. Ersten Tenant + Tenant-Admin legt der Instance-Admin unter
 `/instance` an (der Instance-Admin-User selbst wird einmalig per SQL als
 Owner angelegt: `INSERT INTO "user" (email, display_name,
 is_instance_admin) VALUES ('<mail>', '<name>', true);`).
+
+Betriebshinweise Produktion (Stand 2026-07-22):
+- Der App-Branch ist `main` (Staging läuft weiter auf dem
+  Implementierungs-Branch). Erster Deploy: der Pre-Deployment-Migrations-
+  schritt wird beim allerersten Deploy übersprungen („No running
+  containers") — einmal neu deployen, dann laufen die Migrationen.
+- Coolify-Healthcheck ist bei diesem Dockerfile-Deploy AUS: der interne
+  Healthcheck-Exec erreicht Port 3000 nicht (curl fehlt, wget „connection
+  refused"), obwohl die App läuft und Traefik korrekt routet. Liveness bei
+  Bedarf über `/api/health` bzw. die öffentliche URL prüfen.
+- Backups: dieselbe instanzweite S3-Registrierung `hetzner-hel1`.
 
 ## 3. Release-Verifikation (M9)
 
@@ -133,5 +146,9 @@ is_instance_admin) VALUES ('<mail>', '<name>', true);`).
   setzen, EIN echter „Sign in with Microsoft“ mit allowlisted tid UND
   ein Nicht-Allowlisted-Konto (muss abgewiesen werden) — der OIDC-Fluss
   ist nicht CI-abgedeckt.
-- ☐ Produktion: Secrets gesetzt, kein Seed, Backups grün, Healthcheck
-  grün.
+- ☑ **Produktion aufgesetzt** (`lean.forsit.de`, 2026-07-22): Secrets
+  gesetzt, kein Seed, Rollen-Passwörter gesetzt, Instance-Admin per SQL
+  angelegt, erster Tenant (`forsit`) + Tenant-Admin über `/instance`.
+  Backup nach `hetzner-hel1` eingerichtet + Restore-Probe (RTO ~0,44 s,
+  §1.6), Alarm-Worker als Scheduled Task (alle 30 min) läuft. Healthcheck
+  bewusst aus (Dockerfile-Deploy, siehe §2).
