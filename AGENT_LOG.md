@@ -804,3 +804,24 @@ groups by urgency with branch-path second lines").
 
 **Offen (nächste Mobile-Schritte):** Verwaltung-Mitgliedertabelle (rechts
 abgeschnitten), Glance-Label-Kürzung. „Meine Alarme"-Modul war bereits ok.
+
+---
+
+## 2026-07-23 — Mobile-UI: Verwaltung-Mitgliedertabelle scrollbar (Schritt 4)
+
+**Done:** Die Mitgliedertabelle (/[tenant]/admin) war schmaler als ihr Inhalt →
+Spalten „HR"/„Bereiche anlegen" rechts abgeschnitten. Tabelle in einen
+horizontal scrollbaren Container gekapselt + Mindestbreite gesetzt, statt
+Spalten zu quetschen/abzuschneiden.
+- `components/admin-forms.tsx` (MemberTable): `<table>` in
+  `<div class="table-scroll">` gewrappt, `min-width: 460` an der Tabelle
+  (bei `width:100%`) — Desktop-Karte (~688px) füllt normal, schmale Screens
+  scrollen die Karte statt die Seite.
+- `app/globals.css`: `.table-scroll { overflow-x:auto; -webkit-overflow-scrolling:touch; }`.
+
+**Verify:** `tsc` clean; Screenshot iPhone/Android (Tabelle scrollt in der
+Karte, Seite läuft nicht mehr über); e2e admin 12/12 grün (Flag-Toggle,
+Invite, Move, Archiv, /instance-Gating, Invariante 6 unberührt).
+
+**Offen (letzter Baseline-Punkt):** Glance-Mini-Zeilen-Labels zu stark
+gekürzt („A…", „Back…").

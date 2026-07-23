@@ -57,7 +57,8 @@ export function MemberTable({ slug, members }: { slug: string; members: MemberRo
 
   return (
     <>
-      <table style={{ width: "100%", borderCollapse: "collapse" }}>
+      <div className="table-scroll">
+        <table style={{ width: "100%", minWidth: 460, borderCollapse: "collapse" }}>
         <thead>
           <tr>
             <th style={th}>{s.colName}</th>
@@ -91,7 +92,8 @@ export function MemberTable({ slug, members }: { slug: string; members: MemberRo
             </tr>
           ))}
         </tbody>
-      </table>
+        </table>
+      </div>
       <ErrorNote error={error} />
     </>
   );

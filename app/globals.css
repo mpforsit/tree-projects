@@ -144,6 +144,13 @@ input {
   margin: 0 0 10px;
 }
 
+/* Wide content (e.g. the admin member table) scrolls inside its own
+   container so narrow screens never clip columns or scroll the page body. */
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .badge {
   display: inline-flex;
   align-items: center;
