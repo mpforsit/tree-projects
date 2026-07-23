@@ -33,7 +33,10 @@ export function Logo({
   style?: CSSProperties;
 }) {
   const src = SRC[variant];
-  const img: CSSProperties = { height, width: "auto", display: "block" };
+  // No `display` here: the light/dark visibility is owned by CSS
+  // (.lean-logo-light / .lean-logo-dark). An inline display would override
+  // the class rule and render BOTH variants at once (ghosted wordmark).
+  const img: CSSProperties = { height, width: "auto" };
   return (
     <span className="lean-logo" style={{ display: "inline-flex", ...style }}>
       <img className="lean-logo-light" src={src.light} alt="Lean" style={img} />

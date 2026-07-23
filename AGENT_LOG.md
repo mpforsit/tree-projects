@@ -845,3 +845,23 @@ vollständig) + Desktop-Screenshot unverändert (2-up). Reine <768px-CSS-
 Zeilen, Verwaltung-Tabelle, Glance. Noch nicht nach `main`/Prod gezogen —
 auf Owner-Freigabe (gebündelter Deploy) wartend. Offene Beobachtung: mögliche
 Logo-Doppelung (Light+White) in der Logo-Komponente — separat prüfen.
+
+---
+
+## 2026-07-23 — Fix: Logo-Doppelung (Inline-display überstimmte CSS)
+
+**Done:** Das horizontale Logo erschien „doppelt" (blasses Geister-„lean").
+Ursache: `components/logo.tsx` rendert Light- + White-Artwork und lässt CSS
+(`.lean-logo-light/-dark`) die Sichtbarkeit umschalten — aber die `<img>`
+trugen inline `display:block`, das die Klassenregel `.lean-logo-dark{display:none}`
+überstimmte (Inline > Klassen-Spezifität). Im Light-Theme rendered dadurch
+BEIDE Varianten nebeneinander.
+- `components/logo.tsx`: inline `display` aus dem img-Style entfernt.
+- `app/globals.css`: `.lean-logo-light { display:block; }` explizit ergänzt,
+  damit die Sichtbarkeit vollständig über die Klassen läuft.
+
+**Verify:** `tsc` clean; e2e-Assertion `.lean-logo img:visible` === 1 in
+BEIDEM Theme (hell + dunkel) grün — vorher wären es im Light-Theme 2 gewesen.
+
+**Hinweis:** War die letzte offene Beobachtung aus der Mobile-Runde; Owner-Commit
+b7a95d3 („logo and colors") eingeführt.

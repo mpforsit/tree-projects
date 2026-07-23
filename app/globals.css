@@ -87,6 +87,9 @@ a {
 
 /* Logo artwork swap: light variant by default, white variant on dark
    theme (components/logo.tsx renders both). */
+.lean-logo-light {
+  display: block;
+}
 .lean-logo-dark {
   display: none;
 }
