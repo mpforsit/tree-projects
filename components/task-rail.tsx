@@ -54,7 +54,7 @@ export function TaskRail(props: Props) {
     : ({ disabled: true, title: s.readOnlyTooltip } as const);
 
   return (
-    <aside style={{ width: 320, flexShrink: 0 }}>
+    <aside className="task-rail">
       <div className="panel" style={{ padding: 16 }}>
         <h2 className="section-label">{s.statusLabel}</h2>
         <div className="seg-control" data-testid="status-control">

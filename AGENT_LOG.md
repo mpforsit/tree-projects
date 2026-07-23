@@ -712,3 +712,40 @@ Das Blau des Lockups sticht dadurch leicht aus dem Chrome heraus. Falls das stö
 sollte: entweder die `-mono`-Varianten verwenden oder die Tokens ans Markenblau
 angleichen. `viewport.themeColor` steht bewusst auf dem Markenwert `#0f172a`
 (betrifft nur die mobile Browser-Leiste).
+
+---
+
+## 2026-07-23 — Mobile-UI: Task-View responsiv (Schritt 1 von mehreren)
+
+**Kontext:** Owner-Wunsch, die Mobile-Darstellung zu verfeinern (Design-Brief:
+„mobile secondary" — bisher nicht ausgestaltet). Baseline-Screenshots (iPhone
+390, Android 360) aufgenommen; größter Bruch war die Task-View: das feste
+2-Spalten-Layout (Inhalt + 320px-Rail) quetschte auf Handybreite die Haupt-
+spalte auf ~40px → Beschreibung rendered ein Wort pro Zeile, Seite ~6200px hoch.
+
+**Done (nur Task-View):** Inline-Flex-Layout in CSS-Klassen überführt und per
+Breakpoint gestapelt.
+- `app/globals.css`: `.task-header`, `.task-layout` (Flex-Row, gap 28),
+  `.task-main` (flex:1, min-width:0), `.task-rail` (320px). `@media
+  (max-width:768px)`: Layout → Spalte, `.task-rail` → 100 % Breite + `order:-1`,
+  sodass die Steuerung (Status/Fortschritt/Zeit) über den Detail-Sektionen steht.
+- `app/[tenant]/t/[task]/page.tsx`: Kopf (Status-Chip, Titel, Verantwortlich/
+  Fällig) aus `<main>` in ein vollbreites `<header class="task-header">` gehoben;
+  Container → `.task-layout`, Inhalt → `.task-main`. Mobile-Reihenfolge damit:
+  Breadcrumb → Kopf → Steuerung → Beschreibung/Info/Diskussion/Aktivität.
+- `components/task-rail.tsx`: `<aside>` von Inline-`width:320` auf
+  `className="task-rail"` umgestellt.
+
+**Verify:** `tsc --noEmit` clean. Vorher/Nachher-Screenshots (iPhone + Android)
+im echten Browser: Beschreibung fließt wieder als Absatz, Steuerung voll
+nutzbar, Seitenhöhe 6206px → ~2083px. Desktop bleibt zweispaltig (Kopf jetzt
+vollbreit über den Spalten — leichte, saubere Abweichung vom Handover, das den
+Rail neben dem Titel zeigt).
+
+**Caveats / offen (nächste Mobile-Schritte, mit Owner abgestimmt):**
+1. Topbar mobil überladen (Logo/Tenant/„Meine Arbeit"/Suche/Avatar in einer
+   Zeile) → **Burger-Menü** (Owner-Entscheidung) — als Nächstes.
+2. „Meine Arbeit"-Zeilen brechen schlecht (Titel auf 1 Zeichen gestaucht).
+3. Verwaltung-Mitgliedertabelle rechts abgeschnitten.
+4. Glance-Mini-Zeilen-Labels zu stark gekürzt.
+Der „N"-Kreis auf den Screenshots ist der Next.js-Dev-Indikator, kein UI-Bug.

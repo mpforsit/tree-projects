@@ -140,32 +140,34 @@ export default async function TaskPage({
     <ZoomIn>
       <Breadcrumb slug={slug} crumbs={crumbs} current={task.title} />
 
-      <div style={{ display: "flex", gap: 28, marginTop: 14, alignItems: "flex-start" }}>
-        <main style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-            <StatusChip status={task.status!} />
-            <SignalBadges
-              blocked={task.status === "blocked"}
-              alarm={task.alarm_state_cached}
-            />
-          </div>
-          <h1 style={{ fontSize: 22, margin: "8px 0 4px" }}>{task.title}</h1>
-          <div style={{ fontSize: 12.5, color: "var(--mut2)", marginBottom: 20 }}>
-            {s.responsible}: {responsibleName} · {s.due}:{" "}
-            <span
-              style={{
-                color:
-                  task.alarm_state_cached === "overdue"
-                    ? "var(--al-over)"
-                    : task.alarm_state_cached === "due_soon"
-                      ? "var(--al-due)"
-                      : "inherit",
-              }}
-            >
-              {task.due_date ? formatDateLong(new Date(task.due_date)) : s.noDate}
-            </span>
-          </div>
+      <header className="task-header">
+        <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+          <StatusChip status={task.status!} />
+          <SignalBadges
+            blocked={task.status === "blocked"}
+            alarm={task.alarm_state_cached}
+          />
+        </div>
+        <h1 style={{ fontSize: 22, margin: "8px 0 4px" }}>{task.title}</h1>
+        <div style={{ fontSize: 12.5, color: "var(--mut2)" }}>
+          {s.responsible}: {responsibleName} · {s.due}:{" "}
+          <span
+            style={{
+              color:
+                task.alarm_state_cached === "overdue"
+                  ? "var(--al-over)"
+                  : task.alarm_state_cached === "due_soon"
+                    ? "var(--al-due)"
+                    : "inherit",
+            }}
+          >
+            {task.due_date ? formatDateLong(new Date(task.due_date)) : s.noDate}
+          </span>
+        </div>
+      </header>
 
+      <div className="task-layout">
+        <main className="task-main">
           <section style={{ marginBottom: 24 }}>
             <h2 className="section-label">{s.description}</h2>
             {task.description ? (

@@ -315,6 +315,41 @@ input {
 
 /* ---- task view --------------------------------------------------------- */
 
+.task-header {
+  margin-top: 14px;
+}
+
+.task-layout {
+  display: flex;
+  gap: 28px;
+  margin-top: 18px;
+  align-items: flex-start;
+}
+
+.task-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.task-rail {
+  width: 320px;
+  flex-shrink: 0;
+}
+
+/* Mobile: stack to one column; the action rail moves above the detail
+   sections so status/percent/time stay reachable without scrolling. */
+@media (max-width: 768px) {
+  .task-layout {
+    flex-direction: column;
+    gap: 18px;
+    margin-top: 14px;
+  }
+  .task-rail {
+    width: 100%;
+    order: -1;
+  }
+}
+
 .seg-control {
   display: flex;
   gap: 4px;
