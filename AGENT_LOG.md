@@ -782,3 +782,25 @@ Verwaltung-Mitgliedertabelle (rechts abgeschnitten), Glance-Label-Kürzung.
 Beobachtung (nicht in diesem Schritt): das horizontale Logo wirkt auf den
 Screenshots leicht „doppelt“ (schwaches Geister-„lean“) — evtl. rendert die
 Logo-Komponente Light+White-Artwork gleichzeitig; separat prüfen.
+
+---
+
+## 2026-07-23 — Mobile-UI: „Meine Arbeit"-Zeilen-Reflow (Schritt 3)
+
+**Done:** In der „Meine Arbeit"-Liste stauchte der feste Spaltensatz (Chip,
+Icons, Balken, %, Fälligkeit, „vor N Tagen") den Titel auf 1 Zeichen. Die
+Meta-Elemente in einen `<span class="my-row-meta">` gebündelt; per Breakpoint
+bricht dieser mobil auf eine volle zweite Zeile um, sodass der Titel Zeile 1
+für sich behält. Desktop unverändert (Meta bleibt inline rechts).
+- `app/[tenant]/my/page.tsx`: Meta der Zeilen-Renderfunktion in `.my-row-meta`
+  gewrappt, Zeile bekommt zusätzlich `.my-row`.
+- `app/globals.css`: `.my-row-meta` (Desktop inline-flex); `@media(max-width:768px)`
+  → `.my-row` flex-wrap, `.my-row-meta` volle Breite links, feste
+  Rechtsbündig-Breiten der Datum/„vor N Tagen"-Spans aufgehoben.
+
+**Verify:** `tsc` clean; Screenshots iPhone/Android (Titel lesbar, Pfad +
+Meta darunter) + Desktop unverändert; e2e my-search 9/9 grün (inkl. „My Work
+groups by urgency with branch-path second lines").
+
+**Offen (nächste Mobile-Schritte):** Verwaltung-Mitgliedertabelle (rechts
+abgeschnitten), Glance-Label-Kürzung. „Meine Alarme"-Modul war bereits ok.

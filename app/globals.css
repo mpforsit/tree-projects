@@ -297,6 +297,34 @@ input {
   font-weight: 500;
 }
 
+/* My Work rows: meta (bar/percent/due/last-progress) sits inline on
+   desktop, wraps to a full-width second line on mobile so the title keeps
+   the first line to itself. */
+.my-row-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+@media (max-width: 768px) {
+  .my-row {
+    flex-wrap: wrap;
+    row-gap: 4px;
+  }
+  .my-row-meta {
+    flex-basis: 100%;
+    justify-content: flex-start;
+    gap: 12px;
+    padding-left: 2px;
+  }
+  /* the due/last-progress spans drop their fixed right-aligned widths once
+     they share a left-aligned second line */
+  .my-row-meta > span {
+    width: auto !important;
+    text-align: left !important;
+  }
+}
+
 .filter-chip {
   border: 1px solid var(--border);
   background: var(--surface);

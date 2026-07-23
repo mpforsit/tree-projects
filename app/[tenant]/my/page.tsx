@@ -72,7 +72,7 @@ export default async function MyWorkPage({
       <Link
         key={t.id}
         href={`/${slug}/t/${t.id}`}
-        className="task-row"
+        className="task-row my-row"
         data-testid="my-task-row"
         style={{ textDecoration: "none", padding: "6px 12px" }}
       >
@@ -85,30 +85,32 @@ export default async function MyWorkPage({
             {branchPathLabel(data.nodes, t.path) || "—"}
           </span>
         </span>
-        {t.status === "blocked" && <BlockedIcon size={12} />}
-        <AlarmGlyph state={t.alarm_state_cached} size={12} />
-        <ProgressBar percent={t.percent} width={44} />
-        <PercentNumeral percent={t.percent} size={12.5} />
-        <span
-          style={{
-            width: 52,
-            textAlign: "right",
-            fontSize: 12.5,
-            color:
-              t.alarm_state_cached === "overdue"
-                ? "var(--al-over)"
-                : t.alarm_state_cached === "due_soon"
-                  ? "var(--al-due)"
-                  : "var(--mut2)",
-            fontVariantNumeric: "tabular-nums",
-          }}
-        >
-          {t.due_date ? formatDateShort(new Date(t.due_date)) : "—"}
-        </span>
-        <span style={{ width: 88, textAlign: "right", fontSize: 12, color: "var(--faint)" }}>
-          {lp
-            ? strings.branch.lastProgress(formatAgo(lp))
-            : strings.branch.neverProgressed}
+        <span className="my-row-meta">
+          {t.status === "blocked" && <BlockedIcon size={12} />}
+          <AlarmGlyph state={t.alarm_state_cached} size={12} />
+          <ProgressBar percent={t.percent} width={44} />
+          <PercentNumeral percent={t.percent} size={12.5} />
+          <span
+            style={{
+              width: 52,
+              textAlign: "right",
+              fontSize: 12.5,
+              color:
+                t.alarm_state_cached === "overdue"
+                  ? "var(--al-over)"
+                  : t.alarm_state_cached === "due_soon"
+                    ? "var(--al-due)"
+                    : "var(--mut2)",
+              fontVariantNumeric: "tabular-nums",
+            }}
+          >
+            {t.due_date ? formatDateShort(new Date(t.due_date)) : "—"}
+          </span>
+          <span style={{ width: 88, textAlign: "right", fontSize: 12, color: "var(--faint)" }}>
+            {lp
+              ? strings.branch.lastProgress(formatAgo(lp))
+              : strings.branch.neverProgressed}
+          </span>
         </span>
       </Link>
     );
