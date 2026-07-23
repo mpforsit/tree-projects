@@ -825,3 +825,23 @@ Invite, Move, Archiv, /instance-Gating, Invariante 6 unberührt).
 
 **Offen (letzter Baseline-Punkt):** Glance-Mini-Zeilen-Labels zu stark
 gekürzt („A…", „Back…").
+
+---
+
+## 2026-07-23 — Mobile-UI: Glance einspaltig (Schritt 5, Abschluss der Runde)
+
+**Done:** Die Glance-Karten (12-Spalten-Grid, „big" = span 6) standen mobil
+2-up → Mini-Zeilen-Labels auf „A…"/„Back…" gestaucht. `@media(max-width:768px)`:
+`.glance-grid` → eine Spalte, `grid-auto-rows:auto`; `.glance-card(.big)` →
+`grid-column/row:auto`. Karten volle Breite, natürliche Höhe → Titel und
+Mini-Labels lesbar. Mini-Zeile selbst unverändert. Desktop unverändert.
+- `app/globals.css` (nur Glance-Media-Query).
+
+**Verify:** `tsc` clean; Screenshots iPhone/Android (einspaltig, Labels
+vollständig) + Desktop-Screenshot unverändert (2-up). Reine <768px-CSS-
+Änderung; Desktop-e2e (glance in hardening/views) nicht berührt.
+
+**Mobile-Runde abgeschlossen** (5/5): Task-View, Topbar-Burger, Meine-Arbeit-
+Zeilen, Verwaltung-Tabelle, Glance. Noch nicht nach `main`/Prod gezogen —
+auf Owner-Freigabe (gebündelter Deploy) wartend. Offene Beobachtung: mögliche
+Logo-Doppelung (Light+White) in der Logo-Komponente — separat prüfen.

@@ -260,6 +260,20 @@ input {
   color: var(--text3);
 }
 
+/* Mobile: one card per row at natural height, so titles and mini-row
+   labels stop getting squeezed to "A…". */
+@media (max-width: 768px) {
+  .glance-grid {
+    grid-template-columns: 1fr;
+    grid-auto-rows: auto;
+  }
+  .glance-card,
+  .glance-card.big {
+    grid-column: auto;
+    grid-row: auto;
+  }
+}
+
 /* ---- branch view ------------------------------------------------------- */
 
 .crumb {
