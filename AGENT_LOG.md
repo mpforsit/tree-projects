@@ -749,3 +749,36 @@ Rail neben dem Titel zeigt).
 3. Verwaltung-Mitgliedertabelle rechts abgeschnitten.
 4. Glance-Mini-Zeilen-Labels zu stark gekürzt.
 Der „N"-Kreis auf den Screenshots ist der Next.js-Dev-Indikator, kein UI-Bug.
+
+---
+
+## 2026-07-23 — Mobile-UI: Topbar als Burger-Menü (Schritt 2)
+
+**Done:** Die Topbar drängte sich mobil (Logo + Tenant-Name + „Meine Arbeit“ +
+Suchfeld + Avatar in einer Zeile → Überlauf). Owner-Wahl: Burger-Menü statt
+unterer Tab-Leiste (passt zur „Restraint“-Ästhetik). Umsetzung ohne Logik-
+Duplizierung — das bestehende AvatarMenu wird zum konsolidierten Menü, dessen
+Trigger auf Mobile zum ☰ wird.
+- `app/globals.css`: Topbar-Responsive-Block. <768px: `.topbar-tenant-name`,
+  `.topbar-nav-link` (Meine Arbeit), `.topbar-search` ausgeblendet;
+  `.avatar-initials`→hidden, `.burger-icon`→sichtbar; `.menu-mobile-only`
+  sichtbar.
+- `app/[tenant]/layout.tsx`: die drei Inline-Nav-Elemente mit den Klassen
+  versehen (Suchfeld in `<span class="topbar-search">` gewrappt).
+- `components/avatar-menu.tsx`: Trigger rendert `avatar-initials` (Desktop) +
+  `burger-icon` ☰ (Mobile). Dropdown bekommt einen `menu-mobile-only`-Block
+  oben: Arbeitsbereich-Name, eingebettetes Suchfeld (die /search-Seite hat
+  ohne Query kein Eingabefeld → Suche muss ins Menü), „Meine Arbeit“. Darunter
+  unverändert Verwaltung/Dunkel-Hell/Arbeitsbereich-wechseln/Abmelden.
+
+**Verify:** `tsc --noEmit` clean. Screenshots (iPhone/Android): Topbar mobil =
+Logo + ☰; Menü geöffnet zeigt alle Einträge; Desktop-Topbar unverändert
+(Screenshot-Vergleich). Desktop-Regression e2e grün: tenancy + my-search +
+admin = 18/18 (Avatar-Menü-Tenant-Switch, Topbar-Suche „/“-Fokus,
+Admin-Menü alle unberührt).
+
+**Caveats / offen (nächste Mobile-Schritte):** „Meine Arbeit“-Zeilen-Reflow,
+Verwaltung-Mitgliedertabelle (rechts abgeschnitten), Glance-Label-Kürzung.
+Beobachtung (nicht in diesem Schritt): das horizontale Logo wirkt auf den
+Screenshots leicht „doppelt“ (schwaches Geister-„lean“) — evtl. rendert die
+Logo-Komponente Light+White-Artwork gleichzeitig; separat prüfen.

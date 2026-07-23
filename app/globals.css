@@ -313,6 +313,21 @@ input {
   border-color: var(--btn);
 }
 
+/* ---- topbar: inline nav on desktop, burger menu on mobile ------------- */
+.burger-icon { display: none; }
+.menu-mobile-only { display: none; }
+
+@media (max-width: 768px) {
+  .topbar-tenant-name,
+  .topbar-nav-link,
+  .topbar-search {
+    display: none;
+  }
+  .avatar-initials { display: none; }
+  .burger-icon { display: inline; }
+  .menu-mobile-only { display: block; }
+}
+
 /* ---- task view --------------------------------------------------------- */
 
 .task-header {

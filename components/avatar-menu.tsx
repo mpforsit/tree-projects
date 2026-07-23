@@ -8,6 +8,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
+import { SearchBox } from "@/components/search-box";
 import { strings } from "@/lib/strings";
 
 interface Props {
@@ -76,7 +77,10 @@ export function AvatarMenu({ displayName, tenants, activeSlug, isTenantAdmin }: 
           fontWeight: 650,
         }}
       >
-        {initials}
+        <span className="avatar-initials">{initials}</span>
+        <span className="burger-icon" aria-hidden="true">
+          ☰
+        </span>
       </button>
       {open && (
         <div
@@ -94,6 +98,31 @@ export function AvatarMenu({ displayName, tenants, activeSlug, isTenantAdmin }: 
             zIndex: 10,
           }}
         >
+          <div className="menu-mobile-only">
+            <div
+              style={{
+                padding: "8px 12px 4px",
+                fontSize: 11,
+                textTransform: "uppercase",
+                letterSpacing: ".09em",
+                fontWeight: 650,
+                color: "var(--faint)",
+              }}
+            >
+              {tenants.find((t) => t.slug === activeSlug)?.name ?? ""}
+            </div>
+            <div style={{ padding: "0 12px 8px" }}>
+              <SearchBox slug={activeSlug} />
+            </div>
+            <Link
+              href={`/${activeSlug}/my`}
+              style={item}
+              onClick={() => setOpen(false)}
+            >
+              {strings.shell.myWork}
+            </Link>
+            <div style={{ borderTop: "1px solid var(--border2)", margin: "6px 0" }} />
+          </div>
           {isTenantAdmin && (
             <Link
               href={`/${activeSlug}/admin`}

@@ -50,17 +50,24 @@ export default async function TenantLayout({
         <Link href={`/${active.slug}`} style={{ display: "inline-flex" }}>
           <Logo variant="horizontal" height={24} />
         </Link>
-        <span data-testid="tenant-name" style={{ fontSize: 12.5, color: "var(--mut)" }}>
+        <span
+          data-testid="tenant-name"
+          className="topbar-tenant-name"
+          style={{ fontSize: 12.5, color: "var(--mut)" }}
+        >
           {active.name}
         </span>
         <nav style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 16 }}>
           <Link
             href={`/${active.slug}/my`}
+            className="topbar-nav-link"
             style={{ fontSize: 13, fontWeight: 600, color: "var(--text2)" }}
           >
             {strings.shell.myWork}
           </Link>
-          <SearchBox slug={active.slug} />
+          <span className="topbar-search">
+            <SearchBox slug={active.slug} />
+          </span>
           <AvatarMenu
             displayName={user.name}
             activeSlug={active.slug}
